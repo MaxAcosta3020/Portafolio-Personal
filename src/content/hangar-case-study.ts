@@ -1,0 +1,178 @@
+import { repositoryEvidence } from "./repositories";
+
+const source = (label: string, path: string) => ({ label, ...repositoryEvidence("hangar", path) });
+
+export const hangarSources = {
+  activities: source("Actividades de despliegue", "api/internal/activities/deploy_activities.go"),
+  workflow: source("Workflow de Temporal", "api/internal/workflows/deploy_workflow.go"),
+  api: source("API de aplicaciones", "api/internal/handler/apps.go"),
+  websocket: source("Handler WebSocket", "api/internal/handler/ws.go"),
+  dashboard: source("Logs en el dashboard", "dashboard/app/components/LogStream.tsx"),
+  schema: source("Modelo de datos", "api/internal/db/migrations/001_initial.sql"),
+  decision: source("ADR: Go y Temporal", "docs/adr/001-por-que-go-y-temporal.md"),
+  tests: source("Tests de integración", "api/tests/deploy_integration_test.go"),
+};
+
+export type FlowNode = { title: string; detail: string };
+
+/** Public narrative for the inspected revision. Diagrams explain code, not a live deployment. */
+export const hangarCaseStudy = {
+  href: "/proyectos/hangar",
+  title: "Hangar",
+  subtitle: "De un repositorio Git a una aplicación desplegada.",
+  introduction: "Una plataforma autoalojada que reúne construcción, ejecución, routing y seguimiento de despliegues. Go y Temporal coordinan el trabajo; Next.js permite iniciarlo y seguir sus logs.",
+  kind: "Caso de estudio · Proyecto autodirigido",
+  back: "Volver a proyectos",
+  read: "Leer el caso de Hangar",
+  repositoryLabel: "Explorar código",
+  demoUnavailable: "Demo pública no disponible",
+  contentsLabel: "En este caso",
+  navigation: [
+    { id: "problema", label: "Problema" },
+    { id: "arquitectura", label: "Arquitectura" },
+    { id: "workflow", label: "Workflow" },
+    { id: "aislamiento", label: "Aislamiento" },
+    { id: "logs", label: "Logs" },
+    { id: "decisiones", label: "Decisiones" },
+    { id: "testing", label: "Testing" },
+  ],
+  pipeline: {
+    title: "El recorrido de un despliegue",
+    steps: [
+      { title: "clone", detail: "Obtiene el repositorio y busca un Dockerfile en la raíz." },
+      { title: "build", detail: "Envía el contexto de construcción a Docker y recoge su salida." },
+      { title: "run", detail: "Crea el contenedor con red propia y límites de recursos." },
+      { title: "route", detail: "Configura etiquetas y conecta la aplicación a la red de Traefik." },
+    ] satisfies FlowNode[],
+    caption: "Secuencia conceptual del código. El routing forma parte de RunContainer; no es una actividad independiente de Temporal.",
+    evidence: [hangarSources.activities, hangarSources.workflow],
+  },
+  problem: {
+    title: "Coordinar lo que ocurre después de escribir el código",
+    text: "Desplegar requiere conectar varias operaciones: obtener código, construir una imagen, arrancar el contenedor y darle una ruta de acceso. Hangar intenta reunirlas en un proceso que pueda seguirse desde una interfaz y cuyo estado no dependa de mantener abierta una petición HTTP.",
+    objective: "El ADR plantea conservar el control de la infraestructura y poder retomar workflows tras reinicios. Es el objetivo de diseño; aquí se explica la implementación disponible, sin atribuirle uso comercial ni disponibilidad comprobada.",
+    contributionTitle: "Mi aportación",
+    evidence: [hangarSources.decision, hangarSources.api],
+  },
+  architecture: {
+    title: "Un plano para desplegar; otro para servir",
+    text: "El dashboard solicita el despliegue a la API. La API registra la operación en PostgreSQL e inicia el workflow en Temporal. Un worker ejecuta las actividades que interactúan con Git y Docker.",
+    controlTitle: "Solicitud de despliegue",
+    control: [
+      { title: "Usuario", detail: "Inicia el despliegue" },
+      { title: "Next.js", detail: "Dashboard" },
+      { title: "Go / Fiber", detail: "API REST" },
+      { title: "Temporal", detail: "Workflow y worker" },
+      { title: "Docker", detail: "Build y contenedor" },
+    ] satisfies FlowNode[],
+    routingTitle: "Acceso a la aplicación",
+    routing: [
+      { title: "Petición HTTP", detail: "Subdominio de la app" },
+      { title: "Traefik", detail: "Regla Host en etiquetas Docker" },
+      { title: "Contenedor", detail: "Aplicación desplegada" },
+    ] satisfies FlowNode[],
+    caption: "Dos recorridos distintos: Temporal coordina el despliegue; Traefik dirige el tráfico hacia la aplicación. Los logs vuelven al dashboard por un canal separado.",
+    persistenceTitle: "Estado persistente",
+    persistence: "PostgreSQL relaciona aplicaciones, despliegues y logs. Redis Pub/Sub comunica los nuevos mensajes entre las actividades y el handler WebSocket.",
+    evidence: [hangarSources.api, hangarSources.activities, hangarSources.schema],
+  },
+  workflow: {
+    title: "Separar la coordinación del trabajo",
+    text: "DeployWorkflow invoca las actividades en orden y espera sus resultados. Las operaciones de disco, red y Docker quedan fuera del workflow: esa separación permite mantener el determinismo que requiere Temporal.",
+    statesLabel: "Transiciones de estado contempladas por el código",
+    states: [
+      { title: "pending", detail: "Registro creado" },
+      { title: "running", detail: "Actividades en ejecución" },
+      { title: "success / failed", detail: "Resultado del workflow" },
+    ] satisfies FlowNode[],
+    configurationTitle: "Política configurada por actividad",
+    configuration: [
+      { label: "Máximo de intentos", value: "3" },
+      { label: "Timeout por intento", value: "10 min" },
+      { label: "Espera inicial entre intentos", value: "5 s" },
+      { label: "Factor de backoff", value: "2" },
+    ],
+    configurationNote: "Valores del código, no mediciones de rendimiento.",
+    limitTitle: "Terminar el workflow no valida la URL",
+    limit: "RunContainer registra una advertencia si no logra conectar con la red de Traefik y aun así retorna sin error. El estado success no equivale a una comprobación HTTP de la aplicación. Los errores al guardar el estado final también se ignoran en esta versión.",
+    evidence: [hangarSources.workflow, hangarSources.activities],
+  },
+  isolation: {
+    title: "Multi-tenancy: mecanismos y fronteras",
+    text: "La unidad de separación visible en el código es la aplicación: tiene identificador, subdominio, contenedor y red bridge propios. Esta revisión no acredita una capa completa de cuentas, permisos o aislamiento de datos entre organizaciones.",
+    diagramTitle: "Red propia + red compartida",
+    apps: [
+      { title: "Aplicación A", network: "Red bridge de A" },
+      { title: "Aplicación B", network: "Red bridge de B" },
+    ],
+    sharedNetwork: "Red compartida de Traefik",
+    sharedDetail: "Ambos contenedores también se conectan aquí",
+    caption: "Esquema de dos aplicaciones para explicar la topología, no clientes ni despliegues reales.",
+    resourcesTitle: "Límites por contenedor",
+    resources: [
+      { label: "Memoria", value: "128 MiB" },
+      { label: "Cuota de CPU", value: "0.25 CPU" },
+    ],
+    resourcesNote: "Configuración de Docker en RunContainer; no demuestra aislamiento bajo carga.",
+    limitTitle: "La red compartida importa",
+    limit: "Crear una red por aplicación no demuestra que los tenants no puedan comunicarse entre sí cuando también comparten otra red. El código revisado no basta para afirmar aislamiento lateral completo.",
+    evidence: [hangarSources.activities, hangarSources.schema],
+  },
+  logs: {
+    title: "Logs de despliegue, del worker al navegador",
+    text: "Las actividades registran mensajes del pipeline y la salida de docker build. El helper intenta guardarlos en PostgreSQL y publicarlos en Redis. Son logs del despliegue; el código revisado no implementa un stream general de stdout de la aplicación en ejecución.",
+    liveTitle: "Mensajes nuevos",
+    live: [
+      { title: "Actividades", detail: "Mensajes y salida del build" },
+      { title: "Redis Pub/Sub", detail: "Canal por despliegue" },
+      { title: "WebSocket", detail: "Handler en Go / Fiber" },
+      { title: "Dashboard", detail: "Vista de logs en Next.js" },
+    ] satisfies FlowNode[],
+    historyTitle: "Al abrir la conexión",
+    history: [
+      { title: "PostgreSQL", detail: "Historial del despliegue" },
+      { title: "WebSocket", detail: "Envía primero los registros guardados" },
+      { title: "Dashboard", detail: "Recibe el historial antes de los mensajes nuevos" },
+    ] satisfies FlowNode[],
+    caption: "El backend comprueba periódicamente el estado del despliegue y envía done cuando termina. El navegador recibe los mensajes mediante WebSocket.",
+    limitTitle: "La entrega sin pérdidas sigue pendiente",
+    limit: "El handler lee el historial antes de suscribirse a Redis: existe una ventana entre ambos pasos. Además, el helper ignora errores de escritura y publicación. Este flujo no permite prometer entrega sin pérdidas ni recuperación automática de la conexión.",
+    evidence: [hangarSources.activities, hangarSources.websocket, hangarSources.dashboard],
+  },
+  decisions: {
+    title: "Decisiones con un coste explícito",
+    items: [
+      { title: "Go / Fiber para la API y Go para el worker", reason: "El ADR prioriza un binario único, concurrencia con goroutines y el SDK de Docker Engine en Go.", tradeoff: "La aplicación mantiene API, worker y dashboard como procesos separados.", evidence: [hangarSources.decision] },
+      { title: "Temporal para la orquestación", reason: "Frente a BullMQ o cron, el ADR busca conservar el progreso y retomar la ejecución después de una interrupción.", tradeoff: "Requiere operar Temporal, mantener un worker y respetar el determinismo del workflow. No se reprodujo aquí una prueba de recuperación.", evidence: [hangarSources.decision, hangarSources.workflow] },
+      { title: "PostgreSQL + Redis para los logs", reason: "El historial y la entrega en vivo tienen caminos distintos: persistencia en PostgreSQL y difusión mediante Pub/Sub.", tradeoff: "Escritura y publicación no forman una operación atómica; la continuidad entre historial y stream requiere más validación.", evidence: [hangarSources.activities, hangarSources.websocket] },
+    ],
+    rationaleLabel: "Motivo",
+    tradeoffLabel: "Compromiso",
+  },
+  testing: {
+    title: "Pruebas que cruzan los límites del sistema",
+    text: "El repositorio incluye tests de integración que llaman a la API y consultan PostgreSQL durante un despliegue. Requieren API, worker, Docker, PostgreSQL, Redis, Temporal y un repositorio local de prueba con Dockerfile.",
+    scopeLabel: "Qué comprueban",
+    boundaryLabel: "Alcance de la comprobación",
+    checks: [
+      { title: "Salud y creación de apps", detail: "Respuesta de health, conexión a PostgreSQL, identificador, subdominio y estado inicial." },
+      { title: "Flujo de despliegue", detail: "Espera success en la base de datos y busca mensajes del pipeline. No realiza una petición HTTP a la app desplegada." },
+      { title: "Red Docker", detail: "Consulta su existencia si Docker expone la API TCP; si no está disponible, omite esa comprobación. No prueba bloqueo de tráfico entre apps." },
+      { title: "Colisión y app inexistente", detail: "Compara los subdominios de dos apps con el mismo nombre y espera un 404 al desplegar un identificador inexistente." },
+    ],
+    status: "Código de pruebas revisado · Ejecución no verificada",
+    result: "Lo verificable aquí es la implementación y la existencia de estas comprobaciones. No se publican porcentajes de cobertura, tiempos de despliegue ni resultados de producción sin evidencia reproducible.",
+    evidence: [hangarSources.tests],
+  },
+  sources: {
+    title: "Revisar la implementación",
+    description: "Los enlaces siguientes fijan la versión del código que sustenta este caso. Las limitaciones descritas corresponden a esa revisión.",
+    toggle: "Ver archivos de referencia",
+    label: "Fuente",
+  },
+  closing: {
+    title: "¿Tu proyecto necesita conectar varias piezas?",
+    text: "Podemos conversar sobre el backend, las integraciones y el flujo de trabajo que necesita tu aplicación.",
+    action: "Hablemos",
+  },
+} as const;

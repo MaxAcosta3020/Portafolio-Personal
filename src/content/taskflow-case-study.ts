@@ -1,0 +1,227 @@
+import { repositoryEvidence } from "./repositories";
+
+const source = (label: string, path: string) => ({ label, ...repositoryEvidence("taskflow-pro", path) });
+
+export const taskFlowSources = {
+  architecture: source("Documento de arquitectura", "ARCHITECTURE.md"),
+  server: source("Custom server HTTP + Socket.io", "server.ts"),
+  socket: source("Servidor Socket.io", "lib/socket/index.ts"),
+  publisher: source("Publisher Redis → Socket.io", "lib/socket/publisher.ts"),
+  workers: source("Entrada de workers BullMQ", "workers/index.ts"),
+  scheduler: source("Scheduler de automatizaciones", "workers/processors/scheduler.ts"),
+  tests: source("Tests end-to-end", "tests/e2e/flows.test.ts"),
+  package: source("Dependencias del proyecto", "package.json"),
+};
+
+export type FlowNode = { title: string; detail: string };
+
+/** Public narrative for the inspected revision. Diagrams explain code, not a live deployment. */
+export const taskFlowCaseStudy = {
+  href: "/proyectos/taskflow-pro",
+  title: "TaskFlow Pro",
+  subtitle: "Tableros sincronizados, automatizaciones asíncronas y observabilidad integrada.",
+  introduction: "Una plataforma de gestión de tareas donde los cambios se propagan entre usuarios mediante WebSocket, las automatizaciones se procesan en workers separados y tres capas de observabilidad registran lo que ocurre en el sistema.",
+  kind: "Caso de estudio · Proyecto autodirigido",
+  back: "Volver a proyectos",
+  read: "Leer el caso de TaskFlow Pro",
+  repositoryLabel: "Explorar código",
+  demoUnavailable: "Demo pública no disponible",
+  contentsLabel: "En este caso",
+  navigation: [
+    { id: "problema", label: "Problema" },
+    { id: "arquitectura", label: "Arquitectura" },
+    { id: "realtime", label: "Real-time" },
+    { id: "automatizaciones", label: "Automatizaciones" },
+    { id: "observabilidad", label: "Observabilidad" },
+    { id: "seguridad", label: "Seguridad" },
+    { id: "decisiones", label: "Decisiones" },
+    { id: "testing", label: "Testing" },
+  ],
+  overview: {
+    title: "Tres procesos, un sistema",
+    steps: [
+      { title: "Next.js + Socket.io", detail: "Un custom server comparte HTTP y WebSocket en el mismo proceso." },
+      { title: "Workers BullMQ", detail: "Proceso separado que consume colas de Redis de forma asíncrona." },
+      { title: "Infraestructura Docker", detail: "PostgreSQL, Redis, Nginx, Prometheus y Grafana." },
+    ] satisfies FlowNode[],
+    caption: "Arquitectura documentada en ARCHITECTURE.md. El servidor y los workers son procesos independientes que se comunican a través de Redis.",
+    evidence: [taskFlowSources.architecture, taskFlowSources.server],
+  },
+  problem: {
+    title: "Sincronizar equipos sin recargar la página",
+    text: "Una plataforma de gestión de tareas necesita que los cambios lleguen a todos los miembros del equipo en tiempo real. Además, las automatizaciones —tareas obsoletas, vencimientos próximos, condiciones externas— deben procesarse sin bloquear la interfaz ni depender de que el usuario tenga la aplicación abierta.",
+    objective: "El documento de arquitectura plantea un servidor HTTP compartido para Next.js y Socket.io, con workers BullMQ en un proceso separado para las automatizaciones. La observabilidad se distribuye en tres capas: logs estructurados, métricas y error tracking.",
+    contributionTitle: "Mi aportación",
+    evidence: [taskFlowSources.architecture, taskFlowSources.server],
+  },
+  architecture: {
+    title: "Un proceso HTTP y un proceso worker",
+    text: "server.ts crea un servidor HTTP que monta Next.js para las rutas web y Socket.io para las conexiones WebSocket. Las API routes publican eventos en Redis; el servidor Socket.io los retransmite a los clientes suscritos. Los workers BullMQ corren en un proceso separado y consumen tres colas: automatizaciones, notificaciones y limpieza.",
+    requestTitle: "Flujo de un cambio en el tablero",
+    request: [
+      { title: "Usuario", detail: "Mueve una tarea en el tablero" },
+      { title: "API Route", detail: "Persiste en PostgreSQL vía Prisma" },
+      { title: "Redis Pub/Sub", detail: "Publica el evento al canal del tablero" },
+      { title: "Socket.io", detail: "Retransmite a los clientes conectados" },
+    ] satisfies FlowNode[],
+    automationTitle: "Flujo de una automatización",
+    automation: [
+      { title: "Scheduler", detail: "Evalúa triggers cada 5 minutos" },
+      { title: "BullMQ", detail: "Encola el job en Redis" },
+      { title: "Worker", detail: "Ejecuta acciones y registra resultados" },
+      { title: "Redis Pub/Sub", detail: "Publica el cambio al tablero" },
+    ] satisfies FlowNode[],
+    caption: "Las API routes no tienen acceso directo al servidor Socket.io. Redis Pub/Sub actúa como puente: cualquier proceso puede publicar y el servidor WS retransmite.",
+    modelTitle: "Modelo de datos",
+    model: "User, Session y OAuthAccount gestionan la identidad. Team agrupa miembros y es propietario de los Boards. Cada Board tiene Columns con Tasks. Automation, AutomationAction y AutomationRun representan las recetas y su historial de ejecución. AuditLog registra operaciones críticas.",
+    evidence: [taskFlowSources.architecture, taskFlowSources.server, taskFlowSources.socket, taskFlowSources.publisher],
+  },
+  realtime: {
+    title: "De la API route al navegador, sin recargar",
+    text: "Socket.io necesita un servidor HTTP persistente. Las API routes de Next.js son funciones stateless que no pueden mantener conexiones WebSocket. La solución es un custom server que comparte el proceso HTTP entre ambos.",
+    publishTitle: "Publicación desde la API",
+    publish: [
+      { title: "API Route", detail: "Llama a publishToBoard()" },
+      { title: "Redis", detail: "Publica al canal board:{id}" },
+      { title: "Socket.io", detail: "Suscriptor permanente con psubscribe" },
+      { title: "Clientes", detail: "Reciben el evento en la room del tablero" },
+    ] satisfies FlowNode[],
+    authTitle: "Autenticación en la conexión WebSocket",
+    auth: "El middleware de Socket.io extrae el access token del handshake (auth o cookie), verifica su validez con JWT y comprueba la blacklist en Redis antes de permitir la conexión.",
+    limitTitle: "Los eventos perdidos no se recuperan",
+    limit: "El cliente Socket.io reconecta automáticamente, pero no existe un mecanismo de catch-up que recupere los eventos emitidos durante una desconexión. El documento de arquitectura lo identifica como decisión pendiente.",
+    evidence: [taskFlowSources.socket, taskFlowSources.publisher, taskFlowSources.architecture],
+  },
+  automations: {
+    title: "Tres capas para procesar automatizaciones",
+    text: "El motor de automatizaciones separa la evaluación de triggers, el encolado y la ejecución. Las automatizaciones activas se evalúan periódicamente sin depender de eventos inmediatos del usuario.",
+    layer1Title: "Capa 1 — Evaluación de triggers",
+    layer1: "El scheduler recorre las automatizaciones activas cada 5 minutos. Para cada trigger periódico (TASK_STALE, TASK_DUE_SOON, WEATHER, SCHEDULE) evalúa la condición consultando PostgreSQL o una API externa. Antes de disparar, comprueba si ya existe una ejecución reciente para evitar duplicados.",
+    layer2Title: "Capa 2 — Cola persistente",
+    layer2: "Cuando un trigger se cumple, triggerAutomation() encola un job en BullMQ. La cola garantiza reintentos con backoff exponencial si el worker falla, persistencia si el proceso se detiene, e historial de ejecuciones.",
+    layer3Title: "Capa 3 — Ejecución de acciones",
+    layer3: "El worker de automatizaciones ejecuta cada acción en orden, registra logs detallados y actualiza el AutomationRun con el resultado. Las acciones pueden publicar cambios a Redis Pub/Sub para que lleguen al tablero en tiempo real.",
+    flowLabel: "Recorrido de una automatización",
+    flow: [
+      { title: "Scheduler", detail: "Evalúa TASK_STALE, detecta tareas obsoletas" },
+      { title: "triggerAutomation()", detail: "Encola en BullMQ" },
+      { title: "automationProcessor", detail: "Ejecuta acciones y registra logs" },
+      { title: "AutomationRun", detail: "Resultado persistido en PostgreSQL" },
+    ] satisfies FlowNode[],
+    workersTitle: "Workers configurados",
+    workers: [
+      { label: "Automatizaciones", value: "concurrency: 5" },
+      { label: "Notificaciones", value: "concurrency: 10" },
+      { label: "Limpieza", value: "concurrency: 1" },
+    ],
+    workersNote: "Configuración del código en workers/index.ts. No se ejecutaron pruebas de carga.",
+    limitTitle: "El scheduler requiere instancia única",
+    limit: "El scheduler debe correr en una sola instancia para evitar ejecuciones duplicadas. El documento de arquitectura identifica la coordinación con Redis locks como decisión pendiente para escalado horizontal.",
+    evidence: [taskFlowSources.scheduler, taskFlowSources.workers, taskFlowSources.architecture],
+  },
+  observability: {
+    title: "Logs, métricas y error tracking",
+    text: "La observabilidad se distribuye en tres capas con herramientas especializadas para cada función. No se trata de una lista de tecnologías: cada capa responde a un tipo de pregunta diferente sobre el sistema.",
+    layers: [
+      {
+        title: "Logs estructurados · Pino",
+        detail: "Todos los logs son JSON con campos consistentes: module, userId, jobId. Los secrets y passwords se redactan automáticamente con la configuración de Pino. En producción se pueden enviar a cualquier servicio de log aggregation.",
+      },
+      {
+        title: "Métricas de sistema y negocio · Prometheus + Grafana",
+        detail: "Dos tipos de métricas: infraestructura (latencia HTTP p95, jobs en cola, conexiones WebSocket activas) y negocio (automatizaciones ejecutadas por tipo, tareas completadas). El código registra activeWebSocketConnections con inc/dec en las conexiones de Socket.io.",
+      },
+      {
+        title: "Error tracking · Sentry",
+        detail: "Captura errores con contexto: stack trace, usuario, request. Las alertas de Grafana cubren degradación de rendimiento; Sentry cubre errores específicos.",
+      },
+    ],
+    limitTitle: "Dashboards no verificados",
+    limit: "Se verificó la integración de prom-client en el código del servidor Socket.io y la presencia de @sentry/nextjs en las dependencias. Los dashboards de Grafana y las alertas configuradas no se revisaron durante esta auditoría.",
+    evidence: [taskFlowSources.socket, taskFlowSources.package, taskFlowSources.architecture],
+  },
+  security: {
+    title: "Autenticación, autorización y protección",
+    text: "El sistema implementa varias capas de seguridad documentadas en la arquitectura y verificadas en el código del repositorio.",
+    mechanisms: [
+      {
+        title: "JWT con rotación de refresh tokens",
+        detail: "Access tokens con expiración de 15 minutos. Cada uso del refresh token invalida el anterior en la base de datos y emite uno nuevo. Si un atacante usa el token robado, el siguiente intento del usuario legítimo detecta la invalidación.",
+      },
+      {
+        title: "Blacklist de tokens en Redis",
+        detail: "Para el logout inmediato, el access token se agrega a una blacklist con TTL igual al tiempo de expiración restante. Cada request verifica la blacklist: una operación GET en Redis por request autenticado.",
+      },
+      {
+        title: "Cookies httpOnly y rate limiting",
+        detail: "Los tokens se almacenan en cookies httpOnly, Secure, SameSite=Lax. Rate limiting: 10 intentos de login por IP cada 15 minutos en Redis; 30 req/min general en Nginx.",
+      },
+      {
+        title: "Webhooks HMAC-SHA256",
+        detail: "Verificación de webhooks entrantes con crypto.timingSafeEqual para prevenir timing attacks.",
+      },
+    ],
+    oauthTitle: "Inicio de sesión federado",
+    oauth: "Se verificó la existencia del flujo OAuth de GitHub en el repositorio. El documento de arquitectura no menciona Google como proveedor implementado en esta versión.",
+    limitTitle: "RBAC no auditado",
+    limit: "El CV menciona RBAC. El documento de arquitectura describe Teams y Members con roles. No se revisó en detalle la implementación del middleware de autorización por roles durante esta auditoría.",
+    evidence: [taskFlowSources.architecture, taskFlowSources.socket],
+  },
+  decisions: {
+    title: "Decisiones con un coste explícito",
+    items: [
+      {
+        title: "Custom server.ts compartido entre Next.js y Socket.io",
+        reason: "Las API routes de Next.js son stateless y no pueden mantener conexiones WebSocket persistentes. Un servidor HTTP compartido permite que ambos convivan en el mismo proceso y puerto.",
+        tradeoff: "Se pierde el despliegue serverless nativo de Next.js. El proceso debe mantenerse activo para las conexiones WebSocket.",
+        evidence: [taskFlowSources.server, taskFlowSources.architecture],
+      },
+      {
+        title: "Redis Pub/Sub como puente entre API routes y Socket.io",
+        reason: "Las API routes no tienen acceso directo al objeto io de Socket.io. Redis desacopla la publicación de eventos de su retransmisión y permite escalar horizontalmente.",
+        tradeoff: "Añade una dependencia de comunicación entre componentes del mismo proceso. Los eventos perdidos durante una desconexión del cliente no se recuperan.",
+        evidence: [taskFlowSources.publisher, taskFlowSources.socket],
+      },
+      {
+        title: "BullMQ para automatizaciones y notificaciones",
+        reason: "Reutiliza Redis (ya presente para cache y Pub/Sub), ofrece reintentos con backoff exponencial y un API de TypeScript con genéricos para tipado fuerte.",
+        tradeoff: "El scheduler requiere instancia única o coordinación con locks para evitar ejecuciones duplicadas. Alternativas evaluadas: pg-boss y AWS SQS.",
+        evidence: [taskFlowSources.workers, taskFlowSources.architecture],
+      },
+      {
+        title: "Rotación de refresh tokens con invalidación en base de datos",
+        reason: "Detectar el uso de un token robado: si el atacante lo usa primero, el siguiente intento del usuario legítimo invalida toda la sesión.",
+        tradeoff: "Una consulta a la base de datos por cada renovación de tokens. La blacklist de access tokens añade una operación Redis por request autenticado.",
+        evidence: [taskFlowSources.architecture],
+      },
+    ],
+    rationaleLabel: "Motivo",
+    tradeoffLabel: "Compromiso",
+  },
+  testing: {
+    title: "Flujos end-to-end verificados por Playwright",
+    text: "El repositorio contiene tests E2E con Playwright que recorren los flujos críticos del sistema. Requieren la aplicación, PostgreSQL, Redis y un seed de datos. Se revisó el código de las pruebas, sin ejecutarlas.",
+    scopeLabel: "Qué comprueban",
+    checks: [
+      { title: "Autenticación", detail: "Registro, login, logout y persistencia de sesión. Recorre el formulario completo y verifica la redirección al dashboard." },
+      { title: "Tableros Kanban", detail: "Creación de tablero, creación de tarea, drag and drop entre columnas y persistencia tras recarga." },
+      { title: "Automatizaciones", detail: "Creación de una automatización con trigger TASK_MOVED y acción SEND_NOTIFICATION. Verifica que aparezca activa en la lista." },
+      { title: "Sincronización multi-usuario", detail: "Dos contextos de navegador independientes (Alice y Bob). Alice crea una tarea; Bob la ve sin recargar, validando la propagación por WebSocket con timeout de 5 segundos." },
+    ],
+    testingStack: "Vitest para pruebas unitarias y Playwright para end-to-end.",
+    status: "Código de pruebas revisado · Ejecución no verificada",
+    result: "Lo verificable aquí es la implementación y la existencia de estas comprobaciones. No se publican porcentajes de cobertura, tiempos de ejecución ni resultados de producción sin evidencia reproducible.",
+    evidence: [taskFlowSources.tests, taskFlowSources.package],
+  },
+  sources: {
+    title: "Revisar la implementación",
+    description: "Los enlaces siguientes fijan la versión del código que sustenta este caso. Las limitaciones descritas corresponden a esa revisión.",
+    toggle: "Ver archivos de referencia",
+    label: "Fuente",
+  },
+  closing: {
+    title: "¿Tu proyecto necesita sincronización o automatización?",
+    text: "Podemos conversar sobre la arquitectura en tiempo real, las colas de trabajo y la observabilidad que necesita tu aplicación.",
+    action: "Hablemos",
+  },
+} as const;

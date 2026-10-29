@@ -1,0 +1,157 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@layer base {
+  html {
+    color-scheme: light;
+    scrollbar-color: var(--color-control) var(--color-background);
+  }
+
+  body {
+    @apply bg-background font-sans text-body text-foreground;
+  }
+
+  h1, h2, h3 {
+    @apply font-medium text-balance;
+  }
+
+  p { text-wrap: pretty; }
+  button, input { font: inherit; }
+  button, a, input, summary { -webkit-tap-highlight-color: transparent; }
+  input { caret-color: var(--color-accent); }
+  ::selection { background: var(--color-accent); color: var(--color-on-accent); }
+
+  :focus-visible {
+    outline: var(--focus-width) solid var(--color-accent);
+    outline-offset: var(--focus-offset);
+  }
+
+  [id] { scroll-margin-block-start: var(--scroll-offset); }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root { --duration-state: 0ms; }
+    *, *::before, *::after { scroll-behavior: auto !important; }
+  }
+
+  @media (forced-colors: active) {
+    :focus-visible { outline-color: Highlight; }
+    [aria-pressed="true"], [aria-current] { outline: var(--indicator-width) solid Highlight; }
+    button:disabled { color: GrayText; }
+  }
+}
+
+@layer components {
+  .button {
+    @apply inline-flex min-h-target min-w-target items-center justify-center gap-2 rounded-control border border-accent bg-accent px-4 py-2 text-body font-medium text-on-accent;
+    cursor: pointer;
+    transition-property: background-color, border-color, color;
+    transition-duration: var(--duration-state);
+    transition-timing-function: var(--ease-state);
+
+    @media (hover: hover) {
+      &:hover:not(:disabled):not([aria-disabled="true"]) {
+        @apply border-accent-hover bg-accent-hover;
+      }
+    }
+    &:active:not(:disabled):not([aria-disabled="true"]) {
+      @apply border-accent-active bg-accent-active;
+    }
+    &[aria-pressed="true"] {
+      @apply border-accent-active bg-accent-active;
+    }
+    &:disabled, &[aria-disabled="true"] {
+      @apply cursor-not-allowed border-control bg-disabled text-muted;
+    }
+  }
+
+  .button-secondary {
+    @apply border-control bg-surface text-accent;
+    @media (hover: hover) {
+      &:hover:not(:disabled):not([aria-disabled="true"]) {
+        @apply border-accent bg-surface-muted;
+      }
+    }
+    &:active:not(:disabled):not([aria-disabled="true"]) {
+      @apply border-accent bg-selected text-accent-active;
+    }
+  }
+
+  .text-link {
+    @apply inline-flex min-h-target items-center gap-2 font-medium text-accent underline decoration-1;
+    text-underline-offset: var(--underline-offset);
+    transition: color var(--duration-state) var(--ease-state);
+    @media (hover: hover) { &:hover { @apply text-accent-hover decoration-2; } }
+    &:active { @apply text-accent-active; }
+  }
+
+  .tag {
+    @apply inline-flex items-center gap-2 rounded-control border border-border px-2 py-1 text-label text-muted;
+  }
+
+  .nav-link {
+    @apply flex min-h-target items-center justify-between gap-2 px-3 py-2 text-label text-muted;
+    border-inline-start: var(--indicator-width) solid transparent;
+    transition: background-color var(--duration-state) var(--ease-state);
+    @media (hover: hover) { &:hover { @apply bg-surface-muted text-foreground; } }
+    &[aria-current="location"] {
+      @apply border-accent bg-selected font-medium text-accent;
+    }
+  }
+
+  .field {
+    @apply min-h-target w-full rounded-control border border-control bg-surface px-3 py-2 text-body text-foreground;
+    &::placeholder { @apply text-muted; }
+    &[aria-invalid="true"] { @apply border-error; }
+    &:disabled { @apply cursor-not-allowed bg-disabled text-muted; }
+  }
+
+  .section-heading { @apply mb-3 text-heading; }
+  .page-container { @apply mx-auto w-full max-w-site px-page; }
+  .portfolio-section { @apply border-t border-border py-section; }
+  .portfolio-heading { @apply mb-8 text-heading; }
+  .portfolio-nav-link {
+    @apply inline-flex min-h-target min-w-target items-center justify-center px-3 py-2 text-label font-medium text-foreground;
+    transition: background-color var(--duration-state) var(--ease-state);
+    @media (hover: hover) { &:hover { @apply bg-surface-muted text-accent; } }
+    &:active { @apply bg-selected text-accent-active; }
+  }
+  .project-details {
+    @apply mt-6 border-t border-border;
+    summary {
+      @apply min-h-target cursor-pointer py-3 font-medium text-accent;
+      @media (hover: hover) { &:hover { text-decoration: underline; text-underline-offset: var(--underline-offset); } }
+      &:active { @apply text-accent-active; }
+    }
+  }
+  .contact-surface {
+    @apply bg-accent text-on-accent;
+    :focus-visible { outline-color: var(--color-on-accent); }
+  }
+  .inverse-link {
+    @apply inline-flex min-h-target min-w-target items-center gap-2 py-2 font-medium text-on-accent underline decoration-1;
+    text-underline-offset: var(--underline-offset);
+    @media (hover: hover) { &:hover { @apply decoration-2; } }
+    &:active { @apply decoration-2; }
+  }
+  .section-description { @apply mb-8 max-w-measure text-muted; }
+  .case-copy { @apply max-w-measure text-muted; }
+  .case-diagram { @apply mt-8 border-y border-border bg-surface px-4 py-6 md:px-6; }
+  .case-flow { @apply flex flex-col gap-4 md:flex-row md:gap-3; }
+  .case-flow-step { @apply flex min-w-0 flex-1 flex-col gap-3 md:flex-row md:gap-2; }
+  .case-flow-arrow { @apply flex shrink-0 text-accent; .icon { @apply rotate-90 md:rotate-0; } }
+  .case-index {
+    .text-link { @apply min-w-target; }
+    @variant lg { position: sticky; top: var(--scroll-offset); }
+  }
+  .specimen { @apply border-y border-border bg-surface px-4 py-6 md:px-6; }
+  .icon {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    flex: none;
+    stroke-width: var(--icon-stroke);
+  }
+  .skip-link {
+    @apply fixed top-3 left-3 -translate-y-32 bg-surface px-4 py-3 text-accent underline focus:translate-y-0;
+    z-index: var(--layer-skip);
+  }
+}
