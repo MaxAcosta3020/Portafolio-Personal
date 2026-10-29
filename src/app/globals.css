@@ -152,6 +152,9 @@
   }
   .skip-link {
     @apply fixed top-3 left-3 -translate-y-32 bg-surface px-4 py-3 text-accent underline focus:translate-y-0;
+    transition-property: transform;
+    transition-duration: var(--duration-state);
+    transition-timing-function: var(--ease-state);
     z-index: var(--layer-skip);
   }
 }
