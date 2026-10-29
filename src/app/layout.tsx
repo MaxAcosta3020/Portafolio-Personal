@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import localFont from "next/font/local";
 import { profile } from "@/content/profile";
+import { siteMetadata } from "@/content/site";
 import "./globals.css";
 
 const plexSans = localFont({
@@ -19,14 +20,98 @@ const plexMono = localFont({
   preload: false,
 });
 
+const baseUrl = siteMetadata.siteUrl;
+
 export const metadata: Metadata = {
-  title: profile.name,
+  metadataBase: new URL(baseUrl),
+  title: {
+    template: "%s · ${profile.name}".replace("${profile.name}", profile.name),
+    default: profile.name,
+  },
+  description:
+    "Portafolio de Max Alexander Acosta Valencia, estudiante de Ingeniería en Sistemas Computacionales y desarrollador Full Stack con foco en backend, APIs y sistemas en tiempo real.",
+  authors: [{ name: siteMetadata.author.name, url: siteMetadata.author.url }],
+  robots: { index: true, follow: true },
+  openGraph: {
+    siteName: siteMetadata.siteName,
+    title: {
+      template: "%s · ${profile.name}".replace("${profile.name}", profile.name),
+      default: profile.name,
+    },
+    description:
+      "Portafolio de Max Alexander Acosta Valencia, desarrollador Full Stack con foco en backend, APIs y sistemas en tiempo real.",
+    type: "website",
+    locale: siteMetadata.locale,
+    alternateLocale: ["en-US"],
+    url: baseUrl,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: `${profile.name} · Portafolio`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: "@maxacostado3020",
+    title: profile.name,
+    description:
+      "Portafolio de Max Alexander Acosta Valencia, desarrollador Full Stack con foco en backend, APIs y sistemas en tiempo real.",
+    images: ["/og-image.png"],
+  },
+  alternates: {
+    canonical: baseUrl,
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="es">
-      <body className={`${plexSans.variable} ${plexMono.variable} antialiased`}>{children}</body>
+    <html lang={siteMetadata.language}>
+      <body className={`${plexSans.variable} ${plexMono.variable} antialiased`}>
+        {children}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              name: profile.name,
+              alternateName: "Max Acosta",
+              url: baseUrl,
+              image: `${baseUrl}/og-image.png`,
+              email: siteMetadata.email,
+              jobTitle: profile.role,
+              worksFor: {
+                "@type": "Organization",
+                name: "Tecnológico Nacional de México, campus Culiacán",
+              },
+              knowsAbout: siteMetadata.keywords,
+              sameAs: [
+                "https://github.com/MaxAcosta-30",
+                "https://www.linkedin.com/in/max-acosta-240abb352",
+              ],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: siteMetadata.siteName,
+              url: baseUrl,
+              potentialAction: {
+                "@type": "SearchAction",
+                target: `${baseUrl}/#contacto`,
+                query: "contacto",
+              },
+            }),
+          }}
+        />
+      </body>
     </html>
   );
 }

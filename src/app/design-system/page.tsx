@@ -1,15 +1,24 @@
-import type { Metadata } from "next";
 import { Icon, Tag } from "@/components/ui";
 import { InteractionDemo } from "./interaction-demo";
 import { Navigation } from "./navigation";
 import { profile } from "@/content/profile";
 import { hangar } from "@/content/projects";
+import { siteMetadata } from "@/content/site";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: `Sistema de diseño · ${profile.name}`,
   description: "Referencia de desarrollo de la dirección Plano de sistemas.",
   robots: { index: false, follow: false },
-};
+  alternates: {
+    canonical: `${siteMetadata.siteUrl}/design-system`,
+  },
+  openGraph: {
+    title: `Sistema de diseño · ${profile.name}`,
+    description: "Referencia de desarrollo de la dirección Plano de sistemas.",
+    type: "website",
+    url: `${siteMetadata.siteUrl}/design-system`,
+  },
+} as const;
 
 const colors = [
   { name: "Fondo", token: "background", className: "bg-background", use: "Lienzo mineral" },

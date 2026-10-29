@@ -1,0 +1,86 @@
+# SEO técnico — configuración del portafolio (Prompt 10)
+
+Fecha: 29 de octubre de 2026.
+
+## Qué se implementó
+
+### Metadatos por página
+
+Todas las rutas estáticas tienen `title` y `description` únicos, sin keyword stuffing:
+
+| Ruta | Título | Description | Indexar |
+| --- | --- | --- | --- |
+| `/` | Max Alexander Acosta Valencia · Desarrollador Full Stack | Intro del perfil | Sí |
+| `/proyectos/hangar` | Hangar · Caso de estudio · Max Alexander Acosta Valencia | Introducción del caso Hangar | Sí |
+| `/proyectos/taskflow-pro` | TaskFlow Pro · Caso de estudio · Max Alexander Acosta Valencia | Introducción del caso TaskFlow | Sí |
+| `/design-system` | Sistema de diseño · Max Alexander Acosta Valencia | Referencia de desarrollo | No (noindex, nofollow) |
+
+### Canonical URLs
+
+Cada página declara su URL canónica absoluta en `alternates.canonical`, basada en `siteMetadata.siteUrl`.
+
+### Open Graph
+
+Cada página incluye `og:title`, `og:description`, `og:type`, `og:url` y `og:image` (apunta a `/og-image.png`).
+
+### Twitter/X cards
+
+Cada página incluye `twitter:card: summary_large_image`, título, descripción e imagen.
+
+### robots.txt
+
+`public/robots.txt` permite rastrear todo el sitio y apunta al sitemap. Bloquea `/design-system/` (documentación interna, no indexar).
+
+### sitemap.xml
+
+`public/sitemap.xml` lista las 4 rutas estáticas con `changefreq` y `priority`.
+
+### Favicon
+
+`public/favicon.svg`: ícono vectorial de 32×32 con la paleta del sistema (acento verde profundo).
+
+### Web manifest
+
+`public/site.webmanifest`: nombre, descripción, start_url, colores, icono SVG y `lang: es`.
+
+### Structured data (JSON-LD)
+
+En `layout.tsx`, dos bloques:
+
+1. `Person`: nombre, URL, email, cargo, organización (Tecnológico Nacional de México), áreas de conocimiento y enlaces mismos (GitHub, LinkedIn).
+2. `WebSite`: nombre del sitio, URL y acción de búsqueda potencial.
+
+### HTML semántico
+
+Ya existente: `lang="es"`, encabezados jerárquicos (h1/h2/h3/h4), `skip-link`, regiones `main`, `nav`, `footer`, `article`, `section`, `details`/`summary`, `aria-label`, `aria-labelledby`, `aria-current`, `aria-invalid`, `aria-describedby`, `aria-hidden` en iconos decorativos.
+
+### Alt text
+
+Las imágenes que existan (`og-image.png`, favicon) incluyen `alt`. No hay imágenes de contenido sin texto alternativo.
+
+## Qué el propietario debe proveer / configurar
+
+| Dato | Cómo usarlo | Nota |
+| --- | --- | --- |
+| Dominio real | Reemplazar `https://tu-dominio.com` en `src/content/site.ts` (`siteUrl`), `public/robots.txt` y `public/sitemap.xml` | No se asume posesión de dominio (Prompt 13) |
+| `public/og-image.png` | Imagen 1200×630 para Open Graph y Twitter | No se inventó; se deja como pendiente |
+| Google Analytics | Measurement ID (Prompt 14) | No se conectó aún (requiere cuenta del usuario) |
+| Google Search Console | Token de verificación o TXT DNS (Prompt 14) | No se conectó aún |
+| CV público descargable | `public/CV_MAX-2.pdf` o similar | No se publicó automáticamente el PDF local |
+
+## IMPORTANTE
+
+- **No se conectó Google Analytics ni Search Console.** Esos servicios requieren credenciales de cuenta del propietario (Prompt 10: "Todavía NO conectes Google Analytics ni Search Console"). Queda documentado exactamente qué identificadores no secretos se necesitarán en el Prompt 14.
+- No se inventó ubicación, empresa ni servicio. El dominio `https://tu-dominio.com` es un placeholder explícito que debe reemplazarse antes de publicar.
+- No hay keyword stuffing: las descripciones son reales y extraídas del contenido del portafolio.
+
+## Verificación
+
+- `npm run lint`: correcto.
+- `npm run typecheck`: correcto.
+- `npm run build`: correcto; exportación estática con todas las rutas.
+- `npm test`: 30 pruebas aprobadas.
+
+## Siguiente paso pendiente
+
+El SEO técnico está cerrado. Sigue pendiente el **Prompt 11 — Performance + Accesibilidad** (Lighthouse, Core Web Vitals, carga inicial, imágenes, fonts, CLS, LCP, INP, accesibilidad, reduced motion, etc.), que requiere un nuevo prompt explícito antes de avanzar.

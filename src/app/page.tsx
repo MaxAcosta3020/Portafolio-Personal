@@ -1,16 +1,38 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader, FeaturedProject, EngineeringSystems } from "@/components/portfolio";
 import { Icon } from "@/components/ui";
 import { contact, experience, profile, resume } from "@/content/profile";
 import { engineeringSystems, featuredCaseStudies } from "@/content/projects";
-import { hangarFlow, homepage, portfolioLabels } from "@/content/site";
+import { hangarFlow, homepage, portfolioLabels, siteMetadata } from "@/content/site";
 import { hangarCaseStudy } from "@/content/hangar-case-study";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: `${profile.name} · ${profile.role}`,
   description: profile.introduction.text,
-};
+  alternates: {
+    canonical: `${siteMetadata.siteUrl}/`,
+  },
+  openGraph: {
+    title: `${profile.name} · ${profile.role}`,
+    description: profile.introduction.text,
+    type: "website",
+    url: `${siteMetadata.siteUrl}/`,
+    images: [
+      {
+        url: `${siteMetadata.siteUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: `${profile.name} · Portafolio`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${profile.name} · ${profile.role}`,
+    description: profile.introduction.text,
+    images: [`${siteMetadata.siteUrl}/og-image.png`],
+  },
+} as const;
 
 export default function Home() {
   const featured = homepage.projects.featured.projectIds.flatMap((id) =>

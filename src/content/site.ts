@@ -96,3 +96,29 @@ export const caseStudySections = [
 ] as const;
 
 export const projectLinkLabels = { repository: "Ver repositorio", demo: "Abrir demo" };
+
+/** Metadata de sitio. Reemplazar siteUrl con el dominio real antes de publicar. */
+export const siteMetadata = {
+  siteName: `${profile.name} · Portafolio`,
+  siteUrl: "https://tu-dominio.com", // Pendiente: dominio del propietario (Prompt 13)
+  language: "es",
+  locale: "es-MX",
+  author: {
+    name: profile.name,
+    url: "https://github.com/MaxAcosta-30",
+  },
+  email: contact.email?.href ?? null,
+  keywords: [
+    "desarrollador full stack",
+    "backend",
+    "APIs",
+    "sistemas en tiempo real",
+    "Go",
+    "Node.js",
+    "TypeScript",
+    "Next.js",
+    "Temporal.io",
+    "Docker",
+    "portafolio",
+  ],
+} as const;

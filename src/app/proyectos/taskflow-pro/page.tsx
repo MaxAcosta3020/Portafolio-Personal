@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/portfolio";
@@ -7,12 +6,35 @@ import { Icon } from "@/components/ui";
 import { taskFlowCaseStudy as content, taskFlowSources } from "@/content/taskflow-case-study";
 import { taskFlowPro } from "@/content/projects";
 import { profile } from "@/content/profile";
-import { portfolioLabels } from "@/content/site";
+import { portfolioLabels, siteMetadata } from "@/content/site";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: `TaskFlow Pro · Caso de estudio · ${profile.name}`,
   description: content.introduction,
-};
+  alternates: {
+    canonical: `${siteMetadata.siteUrl}/proyectos/taskflow-pro`,
+  },
+  openGraph: {
+    title: `TaskFlow Pro · Caso de estudio · ${profile.name}`,
+    description: content.introduction,
+    type: "website",
+    url: `${siteMetadata.siteUrl}/proyectos/taskflow-pro`,
+    images: [
+      {
+        url: `${siteMetadata.siteUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: `Caso de estudio: TaskFlow Pro`,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `TaskFlow Pro · Caso de estudio · ${profile.name}`,
+    description: content.introduction,
+    images: [`${siteMetadata.siteUrl}/og-image.png`],
+  },
+} as const;
 
 function CaseSection({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return <section id={id} aria-labelledby={`${id}-title`} className="portfolio-section">
