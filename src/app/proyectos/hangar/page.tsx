@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { SiteHeader } from "@/components/portfolio";
 import { FlowDiagram, IsolationDiagram } from "@/components/hangar-diagrams";
+import { PipelineReveal } from "@/components/pipeline-reveal";
 import { Icon } from "@/components/ui";
 import { hangarCaseStudy as content, hangarSources } from "@/content/hangar-case-study";
 import { hangar } from "@/content/projects";
@@ -61,7 +62,9 @@ export default function HangarCaseStudy() {
         </div>
         <figure aria-labelledby="pipeline-title" className="mt-8 border-y border-border bg-surface-muted px-4 py-6 md:mt-12 md:px-6">
           <figcaption id="pipeline-title" className="mb-6 text-title font-medium">{content.pipeline.title}</figcaption>
-          <FlowDiagram label={content.pipeline.title} nodes={content.pipeline.steps} code />
+          <PipelineReveal>
+            <FlowDiagram label={content.pipeline.title} nodes={content.pipeline.steps} code />
+          </PipelineReveal>
           <p className="mt-6 max-w-measure text-label text-muted">{content.pipeline.caption}</p>
         </figure>
       </header>

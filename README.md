@@ -106,8 +106,11 @@ los diagramas: [caso de Hangar](docs/HANGAR_REVIEW.md).
   no usar sus alternativas como sistema vigente.
 
 No hay biblioteca de componentes o animación adicional, backend, CMS ni base de
-datos. Los formularios y estados de carga de `/design-system` siguen siendo
-demostraciones locales. La homepage usa correo directo, sin formulario simulado.
+datos. GSAP se añade únicamente en la fase 8 para la animación narrativa del
+pipeline de Hangar (reveal de pasos al entrar en viewport, sin layout shifts y
+respetando `prefers-reduced-motion`). Los formularios y estados de carga de
+`/design-system` siguen siendo demostraciones locales. La homepage usa correo
+directo, sin formulario simulado.
 
 ## Cloudflare
 
