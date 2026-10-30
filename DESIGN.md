@@ -1,46 +1,51 @@
 ---
-name: Plano de sistemas
+name: Minimalista con propósito
 description: Sistema visual del portafolio de Max Alexander Acosta Valencia
 colors:
-  background: "#f2f5f3"
+  background: "#f7f5f0"
   surface: "#ffffff"
-  surface-muted: "#e7eeea"
-  foreground: "#182d2d"
-  muted: "#50615f"
-  border: "#bac8c2"
-  control: "#687e75"
+  foreground: "#1a1a18"
+  muted: "#5a5a55"
+  border: "#d8d6d0"
+  control: "#8a8a82"
   accent: "#195c52"
   accent-hover: "#124b43"
   accent-active: "#0d3933"
   on-accent: "#ffffff"
-  selected: "#dcebe4"
-  disabled: "#dfe6e2"
-  success: "#24633e"
-  success-surface: "#e5f0e7"
-  error: "#9b322c"
-  error-surface: "#f9ebe8"
+  focus-ring: "#195c52"
 typography:
   display:
     fontFamily: "IBM Plex Sans, Arial, sans-serif"
-    fontSize: "2.75rem"
-    fontWeight: 500
+    fontSize: "2.25rem"
+    fontWeight: 600
     lineHeight: 1.2
+  heading:
+    fontFamily: "IBM Plex Sans, Arial, sans-serif"
+    fontSize: "1.5rem"
+    fontWeight: 600
+    lineHeight: 1.25
+  title:
+    fontFamily: "IBM Plex Sans, Arial, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 600
+    lineHeight: 1.35
   body:
     fontFamily: "IBM Plex Sans, Arial, sans-serif"
-    fontSize: "1.0625rem"
+    fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.6
+    lineHeight: 1.7
   label:
     fontFamily: "IBM Plex Mono, monospace"
     fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.5
 rounded:
-  control: "0.125rem"
   none: "0"
+  control: "0.125rem"
 spacing:
   unit: "0.25rem"
   gutter: "1.5rem"
+  section: "4rem"
   target: "2.75rem"
 components:
   button-primary:
@@ -49,173 +54,142 @@ components:
     rounded: "{rounded.control}"
     padding: "0.5rem 1rem"
   button-secondary:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "transparent"
     textColor: "{colors.accent}"
     rounded: "{rounded.control}"
     padding: "0.5rem 1rem"
+    border: "1px solid {colors.control}"
+  text-link:
+    textColor: "{colors.accent}"
+    underline: "1px solid {colors.accent}"
+    underlineOffset: "0.2em"
 ---
 
-# Sistema de diseño — Plano de sistemas
+# Sistema de diseño — Minimalista con propósito
 
 ## Overview
 
-**Creative North Star: "Plano de sistemas"**
+Dirección visual aprobada por el propietario: **minimalista con mucho espacio en blanco, pocos elementos, interfaz limpia, donde cada detalle tiene un propósito.** Cada elemento visible debe justificar su existencia. Si no ayuda al lector a entender, navegar o actuar, se elimina.
 
-Dirección B elegida expresamente por Max. La fase 3 materializa sus reglas en
-`/design-system`; no construye el portafolio. Las propuestas anteriores se conservan
-solo como archivo histórico en `docs/VISUAL_DIRECTIONS.md`.
-
-Precisión mediante alineaciones, tipografía legible y relaciones claras. La
-profundidad técnica debe venir de contenido verificable, nunca de terminales
-falsas, diagramas inventados o elementos de dashboard sin función.
-
-**Key Characteristics:**
-
-- Fondo mineral claro, tinta petróleo y un acento verde profundo.
-- Superficies planas; división por espacio y filetes.
-- Una voz principal sans y mono limitada a código y medidas.
-- Controles nativos y movimiento discreto entre estados.
-
-La fuente única de valores de implementación es `src/styles/tokens.css`. El
-frontmatter documenta esos tokens; no constituye otra configuración ejecutable.
-`globals.css` define estilos compartidos con `@apply`; los componentes utilizan
-las mismas utilidades de Tailwind. No hay segundo motor de estilos.
+El carácter viene de la tipografía, el ritmo del espacio y la precisión de los detalles, no de la decoración. Una sola acción principal por pantalla.
 
 ## Colors
 
-Los valores exactos están en el frontmatter y en los tokens CSS homónimos.
+| Token | Valor | Uso |
+| --- | --- | --- |
+| background | `#f7f5f0` | Lienzo principal, claro cálido (no blanco puro frío) |
+| surface | `#ffffff` | Superficies de apoyo; se usa solo cuando sea necesario |
+| foreground | `#1a1a18` | Texto casi negro, lectura principal |
+| muted | `#5a5a55` | Contexto secundario, notas, etiquetas |
+| border | `#d8d6d0` | Línea fina de 1px; separación decorativa, no identifica un control |
+| control | `#8a8a82` | Borde perceptible de campos y controles secundarios |
+| accent | `#195c52` | Acción principal, enlaces, foco, un solo estado destacado |
+| accent-hover | `#124b43` | Respuesta a hover, solo dispositivos con hover |
+| accent-active | `#0d3933` | Respuesta a pulsación |
+| on-accent | `#ffffff` | Texto sobre acción de acento |
+| focus-ring | `#195c52` | Contorno de foco visible |
 
-| Token | Uso |
-| --- | --- |
-| background | Lienzo principal |
-| surface / surface-muted | Muestras, campos y apoyo visual |
-| foreground / muted | Lectura principal y contexto secundario |
-| border | Separadores decorativos; no identifica por sí solo un control |
-| control | Borde perceptible de campos y controles secundarios |
-| accent / on-accent | Acción principal, enlaces y foco / texto sobre acción |
-| accent-hover / accent-active | Respuesta a hover y pulsación |
-| selected | Fondo de selección, siempre acompañado de texto o control nativo |
-| disabled | Fondo deshabilitado; texto muted y atributo disabled real |
-| success / success-surface | Validación correcta con texto e icono |
-| error / error-surface | Error explicativo con posibilidad de recuperación |
-
-No se reservan warning/info sin un caso de uso. Success/error sí se utilizan en
-la demostración de validación; no representan estados reales de un proyecto.
-
-El texto normal busca al menos 4.5:1 y los límites funcionales 3:1. Los bordes
-suaves no cumplen el segundo umbral y son exclusivamente decorativos. El foco
-usa accent y espacio exterior. Ningún estado se comunica solo con color.
+Un solo color de acento, usado con moderación (enlaces, foco, un estado). No hay modo oscuro definido en esta fase; solo si se puede mantener igual de limpio.
 
 ## Typography
 
-IBM Plex Sans local variable para pesos 400, 500 y 600; IBM Plex Mono local 400
-para tokens, código y medidas. Los archivos WOFF2 y licencias están en
-`src/assets/fonts/`. `next/font/local` aplica fallback y `display: swap`. No hay
-peticiones a fuentes externas durante la compilación o la navegación.
+IBM Plex Sans es la voz principal del diseño. IBM Plex Mono se limita a detalles técnicos (stack, rutas, comandos, etiquetas). Máximo dos familias, tres pesos (400, 600 y opcionalmente 500). Se evitan Inter, Roboto y Arial.
 
-| Rol | Menos de 64rem | Desde 64rem | Interlineado |
-| --- | --- | --- | --- |
-| display | 2rem / 32px | 2.75rem / 44px | 1.2 |
-| heading | 1.625rem / 26px | 1.875rem / 30px | 1.2 |
-| title | 1.25rem / 20px | 1.375rem / 22px | 1.3 |
-| body | 1rem / 16px | 1.0625rem / 17px | 1.6 |
-| label | 0.875rem / 14px | Igual | 1.5 |
+| Rol | Tamaño | Peso | Interlineado | Uso |
+| --- | --- | --- | --- | --- |
+| display | 2.25rem | 600 | 1.2 | Título principal, hero |
+| heading | 1.5rem | 600 | 1.25 | Secciones |
+| title | 1.125rem | 600 | 1.35 | Subtítulos, nombres de proyecto |
+| body | 1rem | 400 | 1.7 | Párrafos de lectura |
+| label | 0.875rem | 400 | 1.5 | Detalles técnicos, stack, medidas |
 
-Pesos: normal 400, medium 500, semibold 600. Lectura hasta 64ch. Títulos con
-`text-wrap: balance`, párrafos con `pretty`, antialiasing y medidas con números
-tabulares. El tamaño visual no altera el nivel semántico del encabezado.
+El contraste lo da el tamaño y el peso, no el color. Cuerpo dentro de 60–70 caracteres por línea. `text-wrap: balance` en encabezados, `text-wrap: pretty` en párrafos. Fuentes servidas localmente desde `src/assets/fonts/` (WOFF2), `display: swap`, sin peticiones externas.
 
 ## Layout
 
-- Ancho máximo `site`: 77.5rem, equivalente a 1240px con raíz de 16px.
-- Base de espaciado: 0.25rem. Pasos principales: 4, 8, 12, 16, 24, 32, 48 y 80px.
-- `page`: 20px; desde lg, 40px. `gutter`: 24px.
-- `section`: 56px; desde lg, 80px. `target`: 44px mínimo.
-- Breakpoints centralizados: md 48rem / 768px; lg 64rem / 1024px.
-- Base: una columna. md permite relaciones figura/contexto de 2:1. lg incorpora
-  la retícula de 12 columnas: índice en 2, separación en 1 y contenido en 9.
-- La muestra de columnas es un espécimen del sistema, no una cuadrícula de fondo.
-- Índice lateral solo desde lg. Antes, disclosure nativo para conservar espacio
-  de lectura; sigue accesible con teclado y sin JavaScript.
-- Tokens `feedback` y `validation` reservan altura mínima en la demostración para
-  reducir saltos al cambiar estados. Son mínimos, no alturas fijas: el texto puede
-  crecer con zoom, traducciones o contenido largo sin recortarse.
+- Ancho máximo de lectura: columna estrecha para textos (aprox. 60–70 caracteres por línea); ancho mayor solo para diagramas.
+- Espacio: ritmo vertical generoso basado en una escala única (4px base). El espacio vacío es parte del diseño, no un hueco por rellenar.
+- Base de espaciado: 4px. Pasos principales: 4, 8, 12, 16, 24, 32, 48, 80px.
+- Separación entre secciones: 4rem en escritorio, proporcional en móvil.
+- Contenedor de página: márgenes laterales, contenido centrado, sin llenar el ancho completo innecesariamente.
+- Más espacio antes de un título que entre título y explicación.
 
 ## Elevation & Depth
 
-Sin sombras: token `shadow-none`. La separación usa espacio, tono y bordes
-estructurales. No añadir elevación a los botones ni hover lift a los proyectos.
-No hay overlays que requieran una escala de elevación en esta fase.
+Sin sombras. Sin glassmorphism. Sin tarjetas. La separación se hace con espacio y, como mucho, líneas finas de 1px. No hay elevación en botones ni hover lift.
 
 ## Shapes
 
-Figuras rectangulares, radio 0; controles con radio `control` de 2px. Filetes de
-1px y marcador de selección de 2px. No hay tarjetas anidadas ni iconos en cajas
-ornamentales. Los bloques de la referencia agrupan muestras funcionales.
+Radio cero o mínimo, aplicado de forma consistente. Figuras rectangulares. Controles con radio mínimo (2px). No hay tarjetas anidadas ni iconos en cajas ornamentales.
 
 ## Components
 
 ### Botones
 
-`Button` en `src/components/ui.tsx`: API nativa de botón, `type="button"` por
-defecto, variantes primary y secondary. No es un componente polimórfico ni
-intercambia enlaces y botones. Acciones navegan con `<a>`; cambios de estado con
-`<button>`. Altura y ancho mínimos target, padding de escala y radio control.
+API nativa de botón, `type="button"` por defecto. Variantes primary y secondary. No es polimórfico; acciones navegan con `<a>`, cambios de estado con `<button>`. Altura y ancho mínimos target (44px), padding de escala, radio control.
 
 | Estado | Tratamiento |
 | --- | --- |
-| Default | Primary accent/on-accent; secondary surface/accent con borde control |
-| Hover | accent-hover en primary; surface-muted en secondary; solo dispositivos con hover |
-| Active | accent-active en primary; selected en secondary |
-| Focus visible | Contorno accent de 2px, separado 3px; no depende de hover |
-| Selected | aria-pressed, etiqueta estable, icono de confirmación y fondo activo |
-| Disabled | disabled nativo, fondo disabled, texto muted y cursor no disponible |
+| Default | Primary: fondo acento / texto on-accent. Secondary: fondo transparente / borde control / texto acento |
+| Hover | Primary: acento-hover. Secondary: fondo surface-muted, borde acento |
+| Active | Primary: acento-active. Secondary: fondo seleccionado, texto acento-active |
+| Focus visible | Contorno acento de 2px, separado 3px |
+| Disabled | Deshabilitado nativo, fondo deshabilitado, texto muted |
 
-No se reduce opacidad a todo el control ni se elimina contraste del texto. No hay
-escala en pulsación: esta dirección prioriza estabilidad y respuestas frecuentes
-sin movimiento geométrico.
+No se reduce opacidad ni se elimina contraste. No hay escala en pulsación.
 
-### Enlaces, etiquetas e iconografía
+### Enlaces
 
-`.text-link`: texto subrayado, underline-offset centralizado, foco y target. El
-enlace externo incluye icono y conserva la navegación normal en la misma pestaña.
-`Tag` describe contenido y no entra en el orden de tabulación.
+`.text-link`: texto subrayado con `text-underline-offset` centralizado, foco visible y target táctil. Enlace externo incluye icono y conserva navegación en la misma pestaña.
 
-`Icon`: SVG propios de 20px, trazo único 1.5, `currentColor`, `aria-hidden` y
-`focusable=false`. Flecha, enlace externo, check y error. Siempre acompañados de
-texto; no añaden etiquetas duplicadas a lectores de pantalla. El peso de los
-controles se mantiene en 500 para acompañar ese trazo.
+### Iconografía
+
+Casi ninguna. Solo si comunica algo que el texto no puede. SVG de 20px, trazo único 1.5, `currentColor`, `aria-hidden`, `focusable=false`. Siempre acompañados de texto.
 
 ### Campos y estados
 
-Input nativo con label, required, ayuda enlazada, aria-invalid y aria-describedby.
-Error textual y foco en el campo que necesita corrección. Confirmación en región
-`status` de anuncio cortés. La demostración no envía ni almacena información.
+Input nativo con label estático arriba (no flotante), helper visible siempre, `aria-describedby`, `aria-invalid`. Error con mensaje específico debajo del campo, no solo color rojo. Sin sombras ni fondos de color en el campo. Trazo fino (1px) como borde, radio mínimo. El único color es el acento en estado activo y el color de error.
 
-Los estados vacío, cargando, listo y error se seleccionan mediante radios nativos
-con legend; permiten flechas de teclado. La carga es explícitamente simulada,
-controlada por el usuario y estática. No hay espera artificial ni spinner perpetuo.
-El error ofrece una acción de recuperación. Los detalles usan `<details>` y
-`<summary>` nativos.
+### Navegación
 
-### Navegación y preview
+Enlaces de texto simples, pocos ítems, sin iconos decorativos. Estado activo claro. Enlace de salto al contenido. Funciona sin JavaScript.
 
-Índice por anclas, aria-current sincronizado con el hash; no simula seguimiento
-continuo del scroll. El enlace de salto lleva el foco a main. Secciones y artículo
-con títulos identificados. La muestra de Hangar está rotulada como composición:
-no contiene stack, resultados ni pantallas inventados, ni enlace a una demo falsa.
+### Proyectos
 
-### Movimiento y accesibilidad
+Presentados como listas editoriales (título, una línea de descripción, stack en mono, año) en lugar de cuadrículas de tarjetas. El caso de estudio ocupa su propia página.
 
-Solo transiciones CSS interrumpibles de color y fondo: 140ms, curva
-`cubic-bezier(0.2, 0, 0, 1)`. Sin `transition: all`, stagger, zoom ni `will-change`
-especulativo. Con `prefers-reduced-motion: reduce`, duración cero.
+## Movimiento
 
-Semántica nativa, regiones identificadas, orden DOM de lectura, foco visible,
-44px mínimos en targets, selección de texto contrastada, caret del acento y
-adaptación de foco/selección a forced-colors. Los resultados de revisión y sus
-límites están en `docs/DESIGN_SYSTEM_REVIEW.md`; no son una certificación de
-accesibilidad ni sustituyen una prueba con lector de pantalla real.
+Discreto. Solo opacidad y transformaciones, 150–250ms, sin rebotes. GSAP únicamente para explicar el pipeline o la arquitectura de los casos de estudio. Todo con `prefers-reduced-motion`. Sin animación en el hero más allá de una aparición discreta. Si una animación no ayuda a entender, se elimina.
+
+## Mobile
+
+Misma jerarquía, una columna, mismo espacio relativo. No es una versión recortada.
+
+## Prueba del propósito
+
+Para cada elemento de la propuesta (navegación, hero, cada sección, cada detalle visual), responder:
+
+> "¿Qué hace este elemento por quien lo lee?"
+
+Si la respuesta es "se ve bien" o "es lo que se suele poner", se elimina.
+
+## Cómo evitar el minimalismo de plantilla
+
+Minimalista no debe significar "clon de portfolio de Vercel/Notion". Qué hace distinto a este diseño:
+
+- Una decisión tipográfica con carácter: IBM Plex Sans como voz principal, IBM Plex Mono solo para detalles técnicos.
+- Un detalle propio y funcional: tratamiento de diagramas en SVG de trazo fino y monocromo, con acento solo en el flujo clave.
+- Un ritmo de espacio reconocible: escala única basada en 4px, espacio vacío intencional.
+
+## Riesgos
+
+| Riesgo | Mitigación |
+| --- | --- |
+| Parecer vacío | Cada sección tiene un propósito definido; el espacio vacío es intencional, no falta de contenido |
+| Poca jerarquía | El contraste lo da tamaño y peso tipográfico; roles claramente diferenciados |
+| Pérdida de personalidad | La tipografía IBM Plex y el tono cálido del fondo dan carácter sin decoración |
+| Minimalismo genérico | Ningún elemento es "lo que se suele poner"; todo pasa la prueba del propósito |
 
 ## Do's and Don'ts
 

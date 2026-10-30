@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { profile } from "@/content/profile";
 import { siteMetadata } from "@/content/site";
 import { Analytics } from "@/components/analytics";
+import { CookieConsent } from "@/components/cookie-consent";
 import "./globals.css";
 
 const plexSans = localFont({
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
     url: baseUrl,
     images: [
       {
-        url: "/og-image.png",
+        url: `${baseUrl}/og-image.svg`,
         width: 1200,
         height: 630,
         alt: `${profile.name} · Portafolio`,
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={`${plexSans.variable} ${plexMono.variable} antialiased`}>
         <Analytics />
         {children}
+        <CookieConsent />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

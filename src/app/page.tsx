@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { SiteHeader, FeaturedProject, EngineeringSystems } from "@/components/portfolio";
+import { SiteHeader } from "@/components/portfolio";
 import { Icon } from "@/components/ui";
-import { contact, experience, profile, resume } from "@/content/profile";
+import { LinkPreferenciasCookies } from "@/components/cookie-consent";
+import { contact, profile } from "@/content/profile";
 import { engineeringSystems, featuredCaseStudies } from "@/content/projects";
-import { hangarFlow, homepage, portfolioLabels, siteMetadata } from "@/content/site";
-import { hangarCaseStudy } from "@/content/hangar-case-study";
+import { homepage, portfolioLabels, projectLinkLabels, siteMetadata } from "@/content/site";
 
 export const metadata = {
   title: `${profile.name} · ${profile.role}`,
@@ -19,7 +19,7 @@ export const metadata = {
     url: `${siteMetadata.siteUrl}/`,
     images: [
       {
-        url: `${siteMetadata.siteUrl}/og-image.png`,
+        url: `${siteMetadata.siteUrl}/og-image.svg`,
         width: 1200,
         height: 630,
         alt: `${profile.name} · Portafolio`,
@@ -35,135 +35,104 @@ export const metadata = {
 } as const;
 
 export default function Home() {
-  const featured = homepage.projects.featured.projectIds.flatMap((id) =>
-    featuredCaseStudies.filter((project) => project.id === id && project.status !== "draft"));
-  const systems = homepage.projects.engineering.projectIds.flatMap((id) =>
-    engineeringSystems.filter((project) => project.id === id && project.status === "ready"));
+  const featured = featuredCaseStudies.filter((p) => p.status !== "draft");
+  const systems = engineeringSystems.filter((p) => p.status === "ready");
 
   return (
     <>
       <a className="skip-link" href="#contenido">{portfolioLabels.skip}</a>
       <SiteHeader />
-      <main id="contenido" tabIndex={-1}>
-        <section aria-labelledby="presentacion-title" className="page-container grid items-center gap-8 py-section md:grid-cols-12 md:gap-gutter">
-          <div className="min-w-0 md:col-span-7 lg:col-span-6">
-            <h1 id="presentacion-title" className="text-display">{homepage.hero.headline}</h1>
-            <p className="mt-6 max-w-measure text-muted">{homepage.hero.introduction.text}</p>
-            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-              <a className="button" href={`#${homepage.hero.primaryAction.sectionId}`}>{homepage.hero.primaryAction.label}<Icon name="arrow" /></a>
-              <a className="text-link" href={`#${homepage.hero.secondaryAction.sectionId}`}>{homepage.hero.secondaryAction.label}</a>
-            </div>
-          </div>
-          <figure className="border-y border-border bg-surface-muted p-6 md:col-span-5 lg:col-start-8">
-            <figcaption className="text-title font-medium">{hangarFlow.title}</figcaption>
-            <p className="mt-1 text-label text-muted">{hangarFlow.caption}</p>
-            <ol className="my-6 divide-y divide-border border-y border-border">
-              {hangarFlow.steps.map((step, index) => <li key={step.code} className="flex items-center justify-between gap-3 py-3">
-                <div className="flex items-center gap-3">
-                  <span aria-hidden="true" className="font-mono text-label tabular-nums text-muted">{String(index + 1).padStart(2, "0")}</span>
-                  <code className="text-label text-accent">{step.code}</code>
-                </div>
-                <span className="text-label text-muted">{step.label}</span>
-              </li>)}
-            </ol>
-            <p className="text-label text-muted">{hangarFlow.description.text}</p>
-            <Link className="text-link mt-3 text-label" href={hangarCaseStudy.href}>{hangarFlow.action}<Icon name="arrow" /></Link>
-          </figure>
-        </section>
+      <main id="contenido" tabIndex={-1} className="page-container">
 
-        <section id={homepage.projects.id} aria-labelledby="proyectos-title" className="portfolio-section bg-surface">
-          <div className="page-container">
-            <div className="mb-8 grid gap-4 md:grid-cols-12 md:gap-gutter">
-              <h2 id="proyectos-title" className="text-heading md:col-span-4">{homepage.projects.title}</h2>
-              <p className="max-w-measure text-muted md:col-span-8 lg:col-span-7 lg:col-start-6">{homepage.projects.introduction}</p>
-            </div>
-            <div id={homepage.projects.featured.id}>
-              {featured.map((project) => <FeaturedProject key={project.id} project={project} />)}
-            </div>
-            <section id={homepage.projects.engineering.id} aria-labelledby="sistemas-title" className="mt-8 lg:mt-12">
-              <h3 id="sistemas-title" className="portfolio-heading">{homepage.projects.engineering.title}</h3>
-              <EngineeringSystems systems={systems} />
-            </section>
+        {/* Hero */}
+        <section aria-labelledby="hero-title" className="mb-[4rem]">
+          <h1 id="hero-title" className="text-display">{profile.name}</h1>
+          <p className="mt-[1rem] max-w-measure text-body">{profile.introduction.text}</p>
+          <div className="mt-[2rem]">
+            <a className="button" href="#contacto">Contactar<Icon name="arrow" /></a>
           </div>
         </section>
 
-        <section id={homepage.about.id} aria-labelledby="sobre-mi-title" className="portfolio-section">
-          <div className="page-container grid gap-8 lg:grid-cols-12 lg:gap-gutter">
-            <div className="lg:col-span-5">
-              <h2 id="sobre-mi-title" className="portfolio-heading">{homepage.about.title}</h2>
-              <div className="space-y-4 text-muted">
-                {profile.about.paragraphs.map((paragraph) => <p key={paragraph.text} className="max-w-measure">{paragraph.text}</p>)}
+        {/* Casos de estudio */}
+        <section id="proyectos" aria-labelledby="casos-title" className="portfolio-section mb-[4rem]">
+          <h2 id="casos-title" className="portfolio-heading">Casos de estudio</h2>
+          {featured.map((project) => (
+            <article key={project.id} id={project.id} className="py-[2rem] border-b border-border last:border-b-0">
+              <h3 className="text-heading">{project.name}</h3>
+              <p className="mt-[0.5rem] max-w-measure text-body">{project.summary?.text ?? ""}</p>
+              <div style={{ fontFamily: "var(--font-mono)", marginTop: "1rem" }}>
+                {project.stack.map((t) => (
+                  <span key={t.name} className="inline-block mr-[0.75rem] mb-[0.5rem] px-[0.5rem] py-[0.2rem] border border-control rounded-control text-label" style={{ fontSize: "0.875rem" }}>
+                    {t.name}
+                  </span>
+                ))}
               </div>
-            </div>
-            <div className="min-w-0 lg:col-span-6 lg:col-start-7">
-              <h3 className="mb-6 text-title">{homepage.education.title}</h3>
-              <dl className="space-y-6">
-                <div>
-                  <dt className="font-medium">{profile.education.program}</dt>
-                  <dd className="mt-1 text-muted">{profile.education.institution}</dd>
-                  <dd className="mt-2 text-label text-muted">{profile.education.status} · {profile.education.dates}</dd>
-                </div>
-                <div>
-                  <dt className="font-medium">{profile.priorEducation.qualification}</dt>
-                  <dd className="mt-1 text-muted">{profile.priorEducation.institution}</dd>
-                  <dd className="mt-2 text-label text-muted">{profile.priorEducation.year}</dd>
-                </div>
-              </dl>
-              {resume.file && <a className="text-link mt-6" href={resume.file.href} download>{resume.label}<Icon name="arrow" /></a>}
-            </div>
-          </div>
-          <section id={homepage.experience.id} aria-labelledby="experiencia-title" className="page-container mt-section">
-            <h3 id="experiencia-title" className="portfolio-heading">{homepage.experience.title}</h3>
-            {experience.filter((item) => item.status === "ready").map((item) => <article key={item.organization} className="grid gap-4 border-t border-border pt-6 md:grid-cols-12 md:gap-gutter">
-              <div className="md:col-span-4 lg:col-span-5">
-                <h4 className="text-title font-medium">{item.organization}</h4>
-                <p className="mt-2 text-label text-muted">{item.dates}</p>
+              <div className="mt-[1.5rem]">
+                <Link className="text-link" href={`/proyectos/${project.id}`}>
+                  {project.id === "hangar" ? "Leer el caso de Hangar" : "Leer el caso de TaskFlow Pro"}<Icon name="arrow" />
+                </Link>
               </div>
-              <div className="md:col-span-8 lg:col-span-6 lg:col-start-7">
-                <p className="font-medium">{item.role}</p>
-                {item.description && <p className="mt-3 max-w-measure text-muted">{item.description.text}</p>}
-              </div>
-            </article>)}
-          </section>
+            </article>
+          ))}
         </section>
 
-        <section id={homepage.skills.id} aria-labelledby="tecnologias-title" className="portfolio-section">
-          <div className="page-container grid gap-8 lg:grid-cols-12 lg:gap-gutter">
-            <div className="lg:col-span-4">
-              <h2 id="tecnologias-title" className="portfolio-heading">{homepage.skills.title}</h2>
-              <p className="max-w-measure text-muted">{homepage.skills.introduction}</p>
-            </div>
-            <dl className="min-w-0 divide-y divide-border border-y border-border lg:col-span-7 lg:col-start-6">
-              {profile.technicalBackground.groups.map((group) => <div key={group.label} className="grid gap-2 py-5 md:grid-cols-3 md:gap-gutter">
-                <dt className="font-medium">{group.label}</dt>
-                <dd className="text-muted md:col-span-2">{group.items.join(" · ")}</dd>
-              </div>)}
-            </dl>
-          </div>
+        {/* Sistemas secundarios (lista compacta) */}
+        <section id="sistemas-backend" aria-labelledby="sistemas-title" className="mb-[4rem]">
+          <h2 id="sistemas-title" className="portfolio-heading">Ingeniería y sistemas backend</h2>
+          <p className="max-w-measure text-body text-muted mb-[2rem]">Sistemas autodirigidos con enfoque en backend, seguridad y arquitectura.</p>
+          <ul className="space-y-[1rem] border-t border-border pt-[1.5rem]">
+            {systems.map((project) => (
+              <li key={project.id} id={project.id} className="py-[1rem] border-b border-border last:border-b-0">
+                <div className="flex flex-wrap items-baseline gap-[1rem]">
+                  <h4 className="text-title font-semibold">{project.name}</h4>
+                  <p className="text-label text-muted">{project.engineeringFocus?.text ?? project.summary?.text ?? ""}</p>
+                </div>
+                <div style={{ fontFamily: "var(--font-mono)", marginTop: "0.5rem" }}>
+                  {project.stack.map((t) => (
+                    <span key={t.name} className="inline-block mr-[0.75rem] mb-[0.5rem] px-[0.5rem] py-[0.2rem] border border-control rounded-control text-label" style={{ fontSize: "0.875rem" }}>
+                      {t.name}
+                    </span>
+                  ))}
+                </div>
+                {project.repository && (
+                  <div className="mt-[0.75rem]">
+                    <a className="text-link" href={project.repository.href}>{projectLinkLabels.repository}<Icon name="external" /></a>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
         </section>
 
-        <section id={homepage.contact.id} aria-labelledby="contacto-title" className="contact-surface py-section">
-          <div className="page-container grid gap-8 md:grid-cols-12 md:gap-gutter">
+        {/* Contacto */}
+        <section id="contacto" aria-labelledby="contacto-title" className="contact-surface py-section">
+          <div className="page-container grid gap-[1.5rem] md:grid-cols-12 md:gap-gutter">
             <div className="md:col-span-6">
-              <h2 id="contacto-title" className="mb-4 text-heading">{homepage.contact.title}</h2>
-              <p className="max-w-measure text-title">{homepage.contact.invitation}</p>
-            </div>
-            <div className="min-w-0 md:col-span-5 md:col-start-8">
+              <h2 id="contacto-title" className="text-heading">Contacto</h2>
+              <p className="mt-[0.5rem] max-w-measure text-on-accent">{homepage.contact.invitation}</p>
               {contact.email && <>
-                <a className="button button-secondary" href={contact.email.href}>{portfolioLabels.emailAction}<Icon name="arrow" /></a>
-                <p className="mt-3 break-words text-label">{contact.email.label}</p>
+                <a className="button button-secondary mt-[1rem]" href={contact.email.href}>{portfolioLabels.emailAction}<Icon name="arrow" /></a>
+                <p className="mt-[1rem] text-on-accent text-label">{contact.email.label}</p>
               </>}
-              <p className="mt-6 text-label">{portfolioLabels.profiles}</p>
-              <ul className="mt-1 flex flex-wrap gap-x-6 gap-y-2">
-                {contact.professionalLinks.map((link) => <li key={link.href}><a className="inverse-link" href={link.href}>{link.label}<Icon name="external" /></a></li>)}
+            </div>
+            <div className="md:col-span-5 md:col-start-7">
+              <p className="text-on-accent text-label">{portfolioLabels.profiles}</p>
+              <ul className="mt-[0.5rem] flex flex-wrap gap-x-[1rem] gap-y-[0.5rem]">
+                {contact.professionalLinks.map((link) => (
+                  <li key={link.href}><a className="inverse-link" href={link.href}>{link.label}<Icon name="external" /></a></li>
+                ))}
               </ul>
             </div>
           </div>
         </section>
+
       </main>
-      <footer className="page-container flex flex-wrap items-center justify-between gap-x-8 gap-y-4 py-6">
-        <div><p className="text-label font-medium">{profile.name}</p><p className="mt-1 text-label text-muted">{portfolioLabels.footer}</p></div>
-        <a className="text-link text-label" href="#inicio">{portfolioLabels.backToTop}</a>
+      <footer className="page-container flex flex-wrap items-center justify-between gap-x-[1rem] gap-y-[1rem] py-[1.5rem] border-t border-border">
+        <div><p className="text-label font-semibold">{profile.name}</p><p className="mt-[0.25rem] text-label text-muted">{portfolioLabels.footer}</p></div>
+        <div className="flex flex-wrap items-center gap-x-[1rem] gap-y-[0.5rem]">
+          <LinkPreferenciasCookies />
+          <a className="text-link text-label" href="#inicio">{portfolioLabels.backToTop}</a>
+        </div>
       </footer>
     </>
   );

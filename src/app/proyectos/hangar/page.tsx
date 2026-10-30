@@ -22,7 +22,7 @@ export const metadata = {
     url: `${siteMetadata.siteUrl}/proyectos/hangar`,
     images: [
       {
-        url: `${siteMetadata.siteUrl}/og-image.png`,
+        url: `${siteMetadata.siteUrl}/og-hangar.svg`,
         width: 1200,
         height: 630,
         alt: `Caso de estudio: Hangar`,
@@ -82,7 +82,7 @@ export default function HangarCaseStudy() {
             </div>
           </div>
         </div>
-        <figure aria-labelledby="pipeline-title" className="mt-8 border-y border-border bg-surface-muted px-4 py-6 md:mt-12 md:px-6">
+        <figure aria-labelledby="pipeline-title" className="mt-8 border-y border-border bg-surface px-4 py-6 md:mt-12 md:px-6">
           <figcaption id="pipeline-title" className="mb-6 text-title font-medium">{content.pipeline.title}</figcaption>
           <PipelineReveal>
             <FlowDiagram label={content.pipeline.title} nodes={content.pipeline.steps} code />
@@ -141,7 +141,7 @@ export default function HangarCaseStudy() {
                 <p className="mt-3 text-label text-muted">{content.isolation.resourcesNote}</p>
               </div>
             </div>
-            <div className="mt-8 bg-surface-muted p-6">
+            <div className="mt-8 p-6">
               <h3 className="text-title">{content.isolation.limitTitle}</h3>
               <p className="case-copy mt-3">{content.isolation.limit}</p>
             </div>

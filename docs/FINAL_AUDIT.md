@@ -98,6 +98,22 @@ No se identificó ningún elemento que deba corregirse por parecer una plantilla
 
 ---
 
+## Checklist cruzado (Prompt 15B)
+
+| Tema | Estado | Comentario |
+|------|--------|------------|
+| Adherencia al minimalismo | PASSED | Cada sección de homepage pasa la prueba del propósito; un solo acento (`#195c52`); espaciado según escala única (4px base); sin tarjetas ni sombras; verificado en código y revisiones de diseño. |
+| OG Image y previews | PASSED / NO VERIFICADO | SVG creados (`og-image.svg`, `og-hangar.svg`, `og-taskflow.svg`, 1200×630) con URLs absolutas verificadas en el HTML generado. Preview real compartiendo enlace en redes sociales: **NO VERIFICADO** (requiere URL pública de producción). |
+| Formularios (label, placeholder, helper, estados) | PASSED / NO VERIFICADO | Componente `Field` implementado con label estático, placeholder de formato, helper visible, foco (acento), error (`aria-describedby`/`aria-invalid`), disabled; todo en español y mostrado en `/design-system`. Formulario real con envío a backend: **NO VERIFICADO** (no existe aún; contacto es `mailto:` directo). |
+| Skeletons sin layout shift | PASSED / NO VERIFICADO | Componente `Skeleton` implementado con `animate-pulse motion-reduce:animate-none` y dimensiones exactas vía `className`. Medición real de layout shift en navegador: **NO VERIFICADO**. |
+| CI en verde | NO VERIFICADO | Workflow `.github/workflows/ci.yml` creado, YAML válido y comandos verificados localmente (`npm ci`, `lint`, `typecheck`, `build`, `test`). Ejecución real en GitHub Actions: **NO VERIFICADO** (requiere subir el código). |
+| Seguridad (cabeceras, secretos, dependencias) | PASSED | `public/_headers` con CSP, HSTS, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Frame-Options; `npm audit`: 0 vulnerabilidades; no hay secretos en código ni historial; `.env.local` ignorado. |
+| Aviso legal, privacidad y cookies | PASSED / NO VERIFICADO | Páginas creadas (`/legal/privacidad`, `/legal/cookies`, `/legal/aviso-legal`) con datos del responsable. Revisión por profesional legal: **NO VERIFICADO** (pendiente). |
+| Consentimiento real | PASSED | Analytics solo carga si `cookie_consent_v1 === "true"`; sin consentimiento, cero peticiones a Google Analytics; enlace "Preferencias de cookies" en footer para cambiar decisión; respeta `localStorage` en visitas futuras. |
+| Indexación | PASSED / NO VERIFICADO | Antes de publicar: `robots.txt` correcto, `sitemap.xml` sin `/design-system`, sin `noindex` accidental en páginas indexables, URLs canónicas absolutas. Después de publicar (buscar `site:midominio.com`, verificar en URL real): **NO VERIFICADO** (requiere URL pública). |
+
+---
+
 ## Acciones pendientes
 
 | Prioridad | Acción | Responsable | Fase relacionada |

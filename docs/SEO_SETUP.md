@@ -21,7 +21,20 @@ Cada página declara su URL canónica absoluta en `alternates.canonical`, basada
 
 ### Open Graph
 
-Cada página incluye `og:title`, `og:description`, `og:type`, `og:url` y `og:image` (apunta a `/og-image.png`).
+Cada página incluye `og:title`, `og:description`, `og:type`, `og:url` y `og:image` (URL absoluta basada en `siteMetadata.siteUrl`, que a su vez usa la variable de entorno `NEXT_PUBLIC_SITE_URL`). Las imágenes son SVG estáticos de 1200×630 px:
+
+| Ruta | Imagen OG |
+| --- | --- |
+| `/` | `/og-image.svg` |
+| `/proyectos/hangar` | `/og-hangar.svg` |
+| `/proyectos/taskflow-pro` | `/og-taskflow.svg` |
+| `/design-system` | Sin imagen OG (no indexar) |
+
+Diseño minimalista: fondo liso (`#f7f5f0`), mucho espacio vacío, el nombre de Max, su rol real ("Desarrollador Full Stack") y una línea de acento sutil (`#195c52`). Sin texto diminuto ni decoración.
+
+### Twitter/X cards
+
+Cada página incluye `twitter:card: summary_large_image`, título, descripción e imagen (misma imagen OG absoluta).
 
 ### Twitter/X cards
 
@@ -62,8 +75,10 @@ Las imágenes que existan (`og-image.png`, favicon) incluyen `alt`. No hay imág
 
 | Dato | Cómo usarlo | Nota |
 | --- | --- | --- |
-| Dominio real | Reemplazar `https://tu-dominio.com` en `src/content/site.ts` (`siteUrl`), `public/robots.txt` y `public/sitemap.xml` | No se asume posesión de dominio (Prompt 13) |
-| `public/og-image.png` | Imagen 1200×630 para Open Graph y Twitter | No se inventó; se deja como pendiente |
+| Dominio real | Variable `NEXT_PUBLIC_SITE_URL` en `.env.local`; reemplazar `https://tu-dominio.com` en `public/robots.txt` y `public/sitemap.xml` | No se asume posesión de dominio (Prompt 13) |
+| `public/og-image.svg` | Imagen OG ya generada (1200×630, SVG, < 300 KB) | Puede reemplazarse por un PNG optimizado si se prefiere |
+| `public/og-hangar.svg` | Imagen OG del caso Hangar (1200×630, SVG) | Ya generada |
+| `public/og-taskflow.svg` | Imagen OG del caso TaskFlow Pro (1200×630, SVG) | Ya generada |
 | Google Analytics | Measurement ID (Prompt 14) | No se conectó aún (requiere cuenta del usuario) |
 | Google Search Console | Token de verificación o TXT DNS (Prompt 14) | No se conectó aún |
 | CV público descargable | `public/CV_MAX-2.pdf` o similar | No se publicó automáticamente el PDF local |

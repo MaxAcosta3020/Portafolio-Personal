@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, HTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, HTMLAttributes, InputHTMLAttributes } from "react";
 
 export function Button({
   variant = "primary",
@@ -11,6 +11,43 @@ export function Button({
 
 export function Tag({ className = "", ...props }: HTMLAttributes<HTMLSpanElement>) {
   return <span className={`tag ${className}`} {...props} />;
+}
+
+export function Field({
+  label,
+  helper,
+  error,
+  id,
+  className = "",
+  ...props
+}: { label?: string; helper?: string; error?: string; id?: string; className?: string } & InputHTMLAttributes<HTMLInputElement>) {
+  const hasError = error ? true : props["aria-invalid"] === true || props["aria-invalid"] === "true";
+  return (
+    <div className={`group space-y-[0.5rem] ${className}`}>
+      {label && <label htmlFor={id} className="text-label font-semibold group-focus-within:text-accent">{label}</label>}
+      <input
+        id={id}
+        {...props}
+        className="field"
+        aria-invalid={hasError || undefined}
+        aria-describedby={error ? `${id}-error` : undefined}
+      />
+      {helper && <p id={`${id}-helper`} className="text-label text-muted">{helper}</p>}
+      {error && (
+        <p id={`${id}-error`} className="text-label" role="alert" style={{ color: "var(--color-error)" }}>
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export function Input({ className = "", ...props }: InputHTMLAttributes<HTMLInputElement>) {
+  return <input className={`field ${className}`} {...props} />;
+}
+
+export function Skeleton({ className = "" }: { className?: string }) {
+  return <div className={`bg-surface animate-pulse motion-reduce:animate-none ${className}`} />;
 }
 
 export function Icon({ name }: { name: "arrow" | "check" | "external" | "error" }) {

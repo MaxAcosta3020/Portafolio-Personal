@@ -1,4 +1,4 @@
-import { Icon, Tag } from "@/components/ui";
+import { Field, Icon, Skeleton, Tag } from "@/components/ui";
 import { InteractionDemo } from "./interaction-demo";
 import { Navigation } from "./navigation";
 import { profile } from "@/content/profile";
@@ -90,6 +90,43 @@ export default function DesignSystemPage() {
               <h2 id="interaccion-title" className="section-heading">Interacción</h2>
               <p className="section-description">Hover y pulsación cambian el color; el foco se reconoce por su contorno. Prueba los controles con Tab, Enter, Espacio y las flechas del teclado.</p>
               <InteractionDemo />
+            </section>
+
+            <section id="formularios" aria-labelledby="formularios-title">
+              <h2 id="formularios-title" className="section-heading">Formularios</h2>
+              <p className="section-description">
+                Campos con label estático arriba, helper visible siempre, foco que cambia el borde y el label al acento, y mensajes de error específicos. Un solo campo de nombre completo porque el formulario de contacto es corto y no requiere separar apellidos en el primer contacto.
+              </p>
+              <div className="space-y-[2rem] max-w-measure">
+                <Field label="Nombre completo" id="nombre" placeholder="Juan Pérez García" helper="Nombre tal como aparece en tus documentos" />
+                <Field label="Correo electrónico" id="correo" placeholder="nombre@correo.com" helper="Usa el correo donde prefieras que respondamos" type="email" />
+                <Field label="Mensaje" id="mensaje" placeholder="Cuéntanos sobre tu proyecto" helper="Máximo 500 palabras" />
+                <Field
+                  label="Correo con error"
+                  id="correo-error"
+                  placeholder="nombre@correo.com"
+                  helper="El formato no es válido"
+                  error="Escribe una dirección de correo válida."
+                  type="email"
+                  aria-invalid="true"
+                />
+                <Field label="Campo deshabilitado" id="deshabilitado" placeholder="No disponible" disabled />
+                <div className="flex items-start gap-3 text-accent">
+                  <Icon name="check" />
+                  <div>
+                    <p className="font-semibold">Mensaje enviado.</p>
+                    <p className="mt-1 text-muted">Te responderemos a la brevedad.</p>
+                  </div>
+                </div>
+                <div className="mt-[1rem]">
+                  <p className="text-label font-medium">Skeleton (dimensiones exactas, sin layout shift)</p>
+                  <div className="mt-[0.5rem] flex gap-[0.75rem]">
+                    <Skeleton className="w-[12rem] h-[1rem]" />
+                    <Skeleton className="w-[24rem] h-[2rem]" />
+                    <Skeleton className="w-[4rem] h-[4rem] rounded-control" />
+                  </div>
+                </div>
+              </div>
             </section>
 
             <section id="composicion" aria-labelledby="composicion-title">

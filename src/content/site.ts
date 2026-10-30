@@ -6,7 +6,6 @@ export const navigation = {
   brand: { label: profile.name, href: "/" },
   items: [
     { label: "Proyectos", sectionId: "proyectos" },
-    { label: "Sobre mí", sectionId: "sobre-mi" },
     { label: "Contacto", sectionId: "contacto" },
   ],
   resumeLabel: resume.label,
@@ -100,7 +99,7 @@ export const projectLinkLabels = { repository: "Ver repositorio", demo: "Abrir d
 /** Metadata de sitio. Reemplazar siteUrl con el dominio real antes de publicar. */
 export const siteMetadata = {
   siteName: `${profile.name} · Portafolio`,
-  siteUrl: "https://tu-dominio.com", // Pendiente: dominio del propietario (Prompt 13)
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://tu-dominio.com",
   language: "es",
   locale: "es-MX",
   author: {

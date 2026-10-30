@@ -86,3 +86,67 @@ Tras confirmar el deployment, revisa:
 ## Siguiente paso pendiente
 
 El despliegue está preparado. Sigue pendiente el **Prompt 14 — Google Analytics + Search Console** (integrar Analytics con Measurement ID que tú proporcionarás, verificar Search Console, generar `docs/ANALYTICS_SEARCH_CONSOLE.md`), que requiere un nuevo prompt explícito antes de avanzar.
+
+---
+
+## Integración continua — CI/CD con GitHub Actions (Prompt 13B)
+
+Se añadió `.github/workflows/ci.yml` que se ejecuta en `push` y `pull_request` sobre la rama `main`.
+
+### Jobs del workflow
+
+| Job | Qué hace | Cuándo se ejecuta |
+|-----|----------|-------------------|
+| `lint-typecheck-build` | `npm ci`, `npm run lint`, `npm run typecheck`, `npm run build` | Siempre (push y PR) |
+| `tests-unitarios-contenido` | `npx playwright test content.spec.ts` | Después de lint-typecheck-build |
+| `tests-e2e` | `npm run build` + `npm test` (Playwright desktop y mobile; instala Chromium) | Después de lint-typecheck-build |
+| `audit` | `npm ci` + `npm audit --audit-level=moderate` (no bloquea si hay vulnerabilidades bajas) | Solo en `push`, después de lint-typecheck-build |
+
+### Variables de entorno en CI
+
+El workflow usa valores falsos (no secretos reales) para las variables que el build pudiera necesitar:
+- `NEXT_PUBLIC_SITE_URL=https://ci-example.pages.dev`
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX`
+- `NEXT_PUBLIC_GSC_VERIFICATION=ci-verification-token`
+
+Nunca se usan secretos reales en el workflow. Si en el futuro el sitio requiere variables de entorno para el build, se agregan como secrets de repositorio de GitHub y se inyectan en el job correspondiente sin escribirlas en el archivo YAML.
+
+### Permisos
+
+El workflow declara `permissions: contents: read` (mínimo necesario para checkout).
+
+### CD (despliegue continuo)
+
+El sitio se despliega en **Cloudflare Pages**, que se conecta directamente al repositorio de GitHub y despliega automáticamente cada push a `main`. Por eso **no hay un job de deploy en GitHub Actions**: duplicarlo sería innecesario.
+
+Si CI falla, para evitar que se publique una rama defectuosa, protege la rama `main` en GitHub:
+
+1. Ve a **Settings → Branches → Add branch protection rule**.
+2. Patrón de rama: `main`.
+3. Marca **Require a pull request before merging**.
+4. Marca **Require status checks to pass before merging** y agrega los checks del workflow:
+   - `lint-typecheck-build`
+   - `tests-unitarios-contenido`
+   - `tests-e2e`
+   - `audit` (opcional; si se marca como requerido, ten en cuenta que `continue-on-error` está activado para vulnerabilidades bajas, así que no bloqueará por ellas).
+
+### Cómo ver los resultados del workflow
+
+1. Ve a tu repositorio en GitHub → **Actions**.
+2. Selecciona el workflow **CI**.
+3. Haz clic en una ejecución para ver el detalle de cada job y sus logs.
+4. Las pruebas E2E suben trazas (`trace: retain-on-failure`) y capturas en caso de fallo; se pueden descargar como artefactos desde la ejecución.
+
+### Secretos de repositorio que podrías necesitar
+
+Hoy el sitio estático **no requiere ningún secreto de repositorio** (no hay formulario con API key, ni backend, ni variables de entorno secretas). Si en el futuro agregas alguna (por ejemplo, Analytics con consentimiento en el Prompt 14B), deberás:
+
+1. Agregar el secreto en **GitHub → Settings → Secrets and variables → Actions**.
+2. Referenciarlo en el job correspondiente de `.github/workflows/ci.yml` (nunca escribir el valor real en el YAML).
+3. Agregarlo también en **Cloudflare Pages → Settings → Environment variables** para que el despliegue en producción tenga acceso al mismo valor.
+
+### Verificación
+
+- No se puede ejecutar GitHub Actions localmente de forma fiable. Se validó la sintaxis del YAML y se ejecutaron localmente los mismos comandos que corre el workflow (`npm ci`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm test`), todos aprobados.
+- Marcar como **NO VERIFICADO** que el workflow corre en GitHub hasta que subas el código y se ejecute la primera vez.
+

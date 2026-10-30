@@ -21,7 +21,7 @@ export const metadata = {
     url: `${siteMetadata.siteUrl}/proyectos/taskflow-pro`,
     images: [
       {
-        url: `${siteMetadata.siteUrl}/og-image.png`,
+        url: `${siteMetadata.siteUrl}/og-taskflow.svg`,
         width: 1200,
         height: 630,
         alt: `Caso de estudio: TaskFlow Pro`,
@@ -81,7 +81,7 @@ export default function TaskFlowCaseStudy() {
             </div>
           </div>
         </div>
-        <figure aria-labelledby="overview-title" className="mt-8 border-y border-border bg-surface-muted px-4 py-6 md:mt-12 md:px-6">
+        <figure aria-labelledby="overview-title" className="mt-8 border-y border-border bg-surface px-4 py-6 md:mt-12 md:px-6">
           <figcaption id="overview-title" className="mb-6 text-title font-medium">{content.overview.title}</figcaption>
           <TaskFlowDiagram label={content.overview.title} nodes={content.overview.steps} code />
           <p className="mt-6 max-w-measure text-label text-muted">{content.overview.caption}</p>
@@ -124,7 +124,7 @@ export default function TaskFlowCaseStudy() {
             <div className="case-diagram"><TaskFlowDiagram label={content.realtime.publishTitle} nodes={content.realtime.publish} code /></div>
             <h3 className="mt-8 text-title">{content.realtime.authTitle}</h3>
             <p className="case-copy mt-3">{content.realtime.auth}</p>
-            <div className="mt-8 bg-surface-muted p-6">
+            <div className="mt-8 p-6">
               <h3 className="text-title">{content.realtime.limitTitle}</h3>
               <p className="case-copy mt-3">{content.realtime.limit}</p>
             </div>
@@ -152,7 +152,7 @@ export default function TaskFlowCaseStudy() {
             <h3 className="mt-8 text-title">{content.automations.workersTitle}</h3>
             <Configuration items={content.automations.workers} />
             <p className="mt-3 text-label text-muted">{content.automations.workersNote}</p>
-            <div className="mt-8 bg-surface-muted p-6">
+            <div className="mt-8 p-6">
               <h3 className="text-title">{content.automations.limitTitle}</h3>
               <p className="case-copy mt-3">{content.automations.limit}</p>
             </div>
@@ -163,7 +163,7 @@ export default function TaskFlowCaseStudy() {
             <div className="mt-8">
               <ObservabilityStack />
             </div>
-            <div className="mt-8 bg-surface-muted p-6">
+            <div className="mt-8 p-6">
               <h3 className="text-title">{content.observability.limitTitle}</h3>
               <p className="case-copy mt-3">{content.observability.limit}</p>
             </div>
@@ -176,7 +176,7 @@ export default function TaskFlowCaseStudy() {
             </div>
             <h3 className="mt-8 text-title">{content.security.oauthTitle}</h3>
             <p className="case-copy mt-3">{content.security.oauth}</p>
-            <div className="mt-8 bg-surface-muted p-6">
+            <div className="mt-8 p-6">
               <h3 className="text-title">{content.security.limitTitle}</h3>
               <p className="case-copy mt-3">{content.security.limit}</p>
             </div>

@@ -3,7 +3,6 @@ import AxeBuilder from "@axe-core/playwright";
 import { mkdir } from "node:fs/promises";
 import { contact, profile } from "../src/content/profile";
 import { projects } from "../src/content/projects";
-import { homepage } from "../src/content/site";
 
 const captureDirectory = ".impeccable/review";
 
@@ -14,14 +13,15 @@ test.beforeEach(async ({ page }) => {
 
 test("contenido, accesibilidad y capturas de la portada", async ({ page }, testInfo) => {
   await expect(page).toHaveTitle(`${profile.name} · ${profile.role}`);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(homepage.hero.headline);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(profile.name);
   for (const project of projects) {
     await expect(page.getByRole("heading", { name: project.name, exact: true })).toBeVisible();
-    if (project.repository) {
-      await expect(page.locator(`#${project.id}`).getByRole("link", { name: "Ver repositorio", exact: true })).toHaveAttribute("href", project.repository.href);
+  }
+  for (const system of projects.filter((p) => p.kind === "engineering-system")) {
+    if (system.repository) {
+      await expect(page.locator(`#${system.id}`).getByRole("link", { name: "Ver repositorio", exact: true })).toHaveAttribute("href", system.repository.href);
     }
   }
-  await expect(page.locator("#experiencia").getByRole("heading", { name: "Outlier" })).toBeVisible();
   await expect(page.locator("#proyectos")).not.toContainText("Outlier");
   const accessibility = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
   expect(accessibility.violations).toEqual([]);
@@ -35,7 +35,7 @@ test("navegación, detalles, contacto y targets accesibles", async ({ page }, te
   await expect(page.getByRole("link", { name: "Saltar al contenido" })).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("main")).toBeFocused();
-  for (const label of ["Proyectos", "Sobre mí", "Contacto"]) {
+  for (const label of ["Proyectos", "Contacto"]) {
     const link = page.getByRole("navigation").getByRole("link", { name: label, exact: true });
     await link.focus();
     await expect(link).toHaveCSS("outline-style", "solid");
@@ -44,12 +44,6 @@ test("navegación, detalles, contacto y targets accesibles", async ({ page }, te
     expect(new URL(page.url()).hash).toBe(href);
     const top = await page.locator(href!).evaluate((element) => element.getBoundingClientRect().top);
     expect(top).toBeGreaterThanOrEqual(0);
-  }
-  for (const name of ["Hangar", "TaskFlow Pro"]) {
-    const summary = page.locator("summary").filter({ hasText: name });
-    await summary.focus();
-    await page.keyboard.press("Enter");
-    await expect(summary.locator("..")).toHaveAttribute("open", "");
   }
   const openState = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
   expect(openState.violations).toEqual([]);
@@ -63,13 +57,8 @@ test("navegación, detalles, contacto y targets accesibles", async ({ page }, te
   }).map((element) => element.textContent));
   expect(smallTargets).toEqual([]);
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await expect(page.getByRole("link", { name: "Hablemos", exact: true })).toHaveCSS("transition-duration", "0s");
+  await expect(page.getByRole("link", { name: "Contacto", exact: true })).toHaveCSS("transition-duration", "0s");
   await mkdir(captureDirectory, { recursive: true });
-  // Axe can restore focus to the first link; capture the actual disclosure state.
-  await page.locator("#hangar summary").focus();
-  await page.locator("#hangar").evaluate((element) => element.scrollIntoView({ block: "start" }));
-  // Capture the viewport: an element taller than it can misplace fixed elements in Chromium clips.
-  await page.screenshot({ path: `${captureDirectory}/portfolio-${testInfo.project.name}-details.png` });
   await page.getByRole("link", { name: "Escríbeme", exact: true }).focus();
   await page.locator("#contacto").screenshot({ path: `${captureDirectory}/portfolio-${testInfo.project.name}-contact.png` });
 });

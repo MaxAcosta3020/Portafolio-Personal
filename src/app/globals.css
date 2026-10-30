@@ -12,7 +12,7 @@
   }
 
   h1, h2, h3 {
-    @apply font-medium text-balance;
+    @apply font-semibold text-balance;
   }
 
   p { text-wrap: pretty; }
@@ -22,7 +22,7 @@
   ::selection { background: var(--color-accent); color: var(--color-on-accent); }
 
   :focus-visible {
-    outline: var(--focus-width) solid var(--color-accent);
+    outline: var(--focus-width) solid var(--color-focus-ring);
     outline-offset: var(--focus-offset);
   }
 
@@ -42,7 +42,7 @@
 
 @layer components {
   .button {
-    @apply inline-flex min-h-target min-w-target items-center justify-center gap-2 rounded-control border border-accent bg-accent px-4 py-2 text-body font-medium text-on-accent;
+    @apply inline-flex min-h-target min-w-target items-center justify-center gap-2 rounded-control border border-accent bg-accent px-4 py-2 text-body font-semibold text-on-accent;
     cursor: pointer;
     transition-property: background-color, border-color, color;
     transition-duration: var(--duration-state);
@@ -60,24 +60,24 @@
       @apply border-accent-active bg-accent-active;
     }
     &:disabled, &[aria-disabled="true"] {
-      @apply cursor-not-allowed border-control bg-disabled text-muted;
+      @apply cursor-not-allowed border-control bg-surface text-muted;
     }
   }
 
   .button-secondary {
-    @apply border-control bg-surface text-accent;
+    @apply border-control bg-transparent text-accent;
     @media (hover: hover) {
       &:hover:not(:disabled):not([aria-disabled="true"]) {
-        @apply border-accent bg-surface-muted;
+        @apply border-accent bg-surface;
       }
     }
     &:active:not(:disabled):not([aria-disabled="true"]) {
-      @apply border-accent bg-selected text-accent-active;
+      @apply border-accent-active bg-surface text-accent-active;
     }
   }
 
   .text-link {
-    @apply inline-flex min-h-target items-center gap-2 font-medium text-accent underline decoration-1;
+    @apply inline-flex min-h-target items-center gap-2 font-semibold text-accent underline decoration-1;
     text-underline-offset: var(--underline-offset);
     transition: color var(--duration-state) var(--ease-state);
     @media (hover: hover) { &:hover { @apply text-accent-hover decoration-2; } }
@@ -85,24 +85,25 @@
   }
 
   .tag {
-    @apply inline-flex items-center gap-2 rounded-control border border-border px-2 py-1 text-label text-muted;
+    @apply inline-flex items-center gap-2 rounded-control border border-control px-2 py-1 text-label text-muted;
   }
 
   .nav-link {
     @apply flex min-h-target items-center justify-between gap-2 px-3 py-2 text-label text-muted;
     border-inline-start: var(--indicator-width) solid transparent;
     transition: background-color var(--duration-state) var(--ease-state);
-    @media (hover: hover) { &:hover { @apply bg-surface-muted text-foreground; } }
+    @media (hover: hover) { &:hover { @apply text-foreground; } }
     &[aria-current="location"] {
-      @apply border-accent bg-selected font-medium text-accent;
+      @apply border-accent font-semibold text-accent;
     }
   }
 
   .field {
     @apply min-h-target w-full rounded-control border border-control bg-surface px-3 py-2 text-body text-foreground;
     &::placeholder { @apply text-muted; }
+    &:focus { @apply border-accent; }
     &[aria-invalid="true"] { @apply border-error; }
-    &:disabled { @apply cursor-not-allowed bg-disabled text-muted; }
+    &:disabled { @apply cursor-not-allowed bg-surface text-muted; }
   }
 
   .section-heading { @apply mb-3 text-heading; }
@@ -110,15 +111,15 @@
   .portfolio-section { @apply border-t border-border py-section; }
   .portfolio-heading { @apply mb-8 text-heading; }
   .portfolio-nav-link {
-    @apply inline-flex min-h-target min-w-target items-center justify-center px-3 py-2 text-label font-medium text-foreground;
+    @apply inline-flex min-h-target min-w-target items-center justify-center px-3 py-2 text-label font-semibold text-foreground;
     transition: background-color var(--duration-state) var(--ease-state);
-    @media (hover: hover) { &:hover { @apply bg-surface-muted text-accent; } }
-    &:active { @apply bg-selected text-accent-active; }
+    @media (hover: hover) { &:hover { @apply text-accent; } }
+    &:active { @apply text-accent-active; }
   }
   .project-details {
     @apply mt-6 border-t border-border;
     summary {
-      @apply min-h-target cursor-pointer py-3 font-medium text-accent;
+      @apply min-h-target cursor-pointer py-3 font-semibold text-accent;
       @media (hover: hover) { &:hover { text-decoration: underline; text-underline-offset: var(--underline-offset); } }
       &:active { @apply text-accent-active; }
     }
@@ -128,7 +129,7 @@
     :focus-visible { outline-color: var(--color-on-accent); }
   }
   .inverse-link {
-    @apply inline-flex min-h-target min-w-target items-center gap-2 py-2 font-medium text-on-accent underline decoration-1;
+    @apply inline-flex min-h-target min-w-target items-center gap-2 py-2 font-semibold text-on-accent underline decoration-1;
     text-underline-offset: var(--underline-offset);
     @media (hover: hover) { &:hover { @apply decoration-2; } }
     &:active { @apply decoration-2; }

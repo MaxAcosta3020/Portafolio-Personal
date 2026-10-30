@@ -43,17 +43,17 @@ export function InteractionDemo() {
         <fieldset>
           <legend className="mb-3 text-label font-medium">Estado de la muestra</legend>
           <div className="flex flex-wrap gap-2">
-            {views.map(({ value, label }) => <label key={value} className="flex min-h-target cursor-pointer items-center gap-2 rounded-control border border-control bg-surface px-3 py-2 has-checked:border-accent has-checked:bg-selected has-checked:text-accent">
-              <input type="radio" name="content-state" value={value} checked={view === value} onChange={() => setView(value)} className="size-4 shrink-0 accent-accent" />
-              {label}
-            </label>)}
+          {views.map(({ value, label }) => <label key={value} className="flex min-h-target cursor-pointer items-center gap-2 rounded-control border border-control bg-surface px-3 py-2 has-checked:border-accent has-checked:bg-surface has-checked:text-accent">
+            <input type="radio" name="content-state" value={value} checked={view === value} onChange={() => setView(value)} className="size-4 shrink-0 accent-accent" />
+            {label}
+          </label>)}
           </div>
         </fieldset>
         <div className="mt-6 min-h-feedback border-t border-border pt-6" role="status" aria-live="polite" aria-atomic="true">
           {view === "empty" && <><p className="font-medium">Todavía no hay material de referencia.</p><p className="mt-2 text-muted">Cuando exista evidencia revisada, este espacio podrá mostrar una captura con su contexto.</p></>}
-          {view === "loading" && <><p className="font-medium">Cargando muestra…</p><p className="mt-2 text-muted">Estado de carga simulado. Selecciona Listo o Error para finalizar.</p><div aria-hidden="true" className="mt-4 space-y-3"><div className="h-4 w-3/4 bg-surface-muted" /><div className="h-4 w-1/2 bg-surface-muted" /></div></>}
-          {view === "ready" && <div className="flex items-start gap-3 text-success"><Icon name="check" /><div><p className="font-medium">Muestra lista.</p><p className="mt-2 text-foreground">La confirmación usa texto e icono, además de color.</p></div></div>}
-          {view === "error" && <div><div className="flex items-start gap-3 text-error"><Icon name="error" /><div><p className="font-medium">No se pudo cargar la muestra.</p><p className="mt-2 text-foreground">Error simulado. Puedes volver al estado inicial.</p></div></div><Button className="mt-4" variant="secondary" onClick={() => setView("empty")}>Volver al estado inicial</Button></div>}
+          {view === "loading" && <><p className="font-medium">Cargando muestra…</p><p className="mt-2 text-muted">Estado de carga simulado. Selecciona Listo o Error para finalizar.</p>          <div className="mt-4 space-y-3"><div className="h-4 w-3/4 bg-surface" /><div className="h-4 w-1/2 bg-surface" /></div></>}
+          {view === "ready" && <div className="flex items-start gap-3 text-accent"><Icon name="check" /><div><p className="font-semibold">Muestra lista.</p><p className="mt-2 text-foreground">La confirmación usa texto e icono, además de color.</p></div></div>}
+          {view === "error" && <div><div className="flex items-start gap-3 text-muted"><Icon name="error" /><div><p className="font-semibold">No se pudo cargar la muestra.</p><p className="mt-2 text-foreground">Error simulado. Puedes volver al estado inicial.</p></div></div><Button className="mt-4" variant="secondary" onClick={() => setView("empty")}>Volver al estado inicial</Button></div>}
         </div>
       </div>
 
@@ -70,13 +70,13 @@ export function InteractionDemo() {
           <label htmlFor="sample-name" className="mb-2 block font-medium">Nombre de la muestra <span className="font-normal text-muted">(obligatorio)</span></label>
           <input ref={input} id="sample-name" name="sample-name" className="field" required aria-invalid={invalid || undefined} aria-describedby="sample-help sample-message" autoComplete="off" placeholder="Por ejemplo: revisión visual" onChange={() => { if (message) { setMessage(""); setInvalid(false); } }} />
           <p id="sample-help" className="mt-2 text-label text-muted">Usa un nombre de prueba, sin datos personales.</p>
-          <p id="sample-message" role="status" aria-live="polite" className={`mt-2 min-h-validation ${invalid ? "text-error" : "text-success"}`}>{message}</p>
+          <p id="sample-message" role="status" aria-live="polite" className={`mt-2 min-h-[3.5rem] ${invalid ? "text-accent-active" : "text-accent"}`}>{message}</p>
           <Button className="mt-4" type="submit">Validar muestra</Button>
         </form>
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <Tag>Muestra de diseño</Tag>
-          <Tag className="border-success bg-success-surface text-success"><Icon name="check" />Estado: correcto</Tag>
-          <Tag className="border-error bg-error-surface text-error"><Icon name="error" />Estado: error</Tag>
+          <Tag className="border-control bg-surface text-accent"><Icon name="check" />Estado: correcto</Tag>
+          <Tag className="border-control bg-surface text-muted"><Icon name="error" />Estado: error</Tag>
         </div>
         <p className="mt-3 text-label text-muted">Las etiquetas describen contenido. No son botones ni se incluyen en el orden de tabulación.</p>
       </div>
