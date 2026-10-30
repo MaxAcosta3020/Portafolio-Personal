@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import localFont from "next/font/local";
 import { profile } from "@/content/profile";
 import { siteMetadata } from "@/content/site";
+import { Analytics } from "@/components/analytics";
 import "./globals.css";
 
 const plexSans = localFont({
@@ -64,12 +65,16 @@ export const metadata: Metadata = {
   alternates: {
     canonical: baseUrl,
   },
+  other: {
+    "google-site-verification": process.env.NEXT_PUBLIC_GSC_VERIFICATION ?? "",
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang={siteMetadata.language}>
       <body className={`${plexSans.variable} ${plexMono.variable} antialiased`}>
+        <Analytics />
         {children}
         <script
           type="application/ld+json"
